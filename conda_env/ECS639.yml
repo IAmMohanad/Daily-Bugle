@@ -1,0 +1,25 @@
+name: ECS639
+channels:
+- anaconda
+- defaults
+dependencies:
+- django=1.11.3=py35_0
+- pytz=2017.2=py35h9225bff_1
+- ca-certificates=2017.08.26=h1d4fec5_0
+- certifi=2017.7.27.1=py35h19f42a1_0
+- libedit=3.1=heed3624_0
+- libffi=3.2.1=h4deb6c0_3
+- libgcc-ng=7.2.0=h7cc24e2_2
+- libstdcxx-ng=7.2.0=h7a57d05_2
+- ncurses=6.0=h06874d7_1
+- openssl=1.0.2l=h9d1a558_3
+- pip=9.0.1=py35haa8ec2a_3
+- python=3.5.4=h00c01ad_19
+- readline=7.0=hac23ff0_3
+- setuptools=36.5.0=py35ha8c1747_0
+- sqlite=3.20.1=h6d8b0f3_1
+- tk=8.6.7=h5979e9b_1
+- wheel=0.29.0=py35h601ca99_1
+- xz=5.2.3=h2bcbf08_1
+- zlib=1.2.11=hfbfcf68_1
+prefix: /homes/mnf30/miniconda3/envs/ECS639
