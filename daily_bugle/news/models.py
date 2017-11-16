@@ -9,7 +9,7 @@ class User(model.Models):
 
 	def __str__(self):
         return self.email
-
+		
 class Article(model.Models):
 	title = models.CharField(length=255)
 	text = models.TextField()
