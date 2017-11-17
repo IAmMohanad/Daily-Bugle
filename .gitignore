@@ -1,3 +1,4 @@
 # Ignore PyCache
 daily_bugle/*/__pycache__
 daily_bugle/*/*/__pycache__
+daily_bugle/daily_bugle/db.sqlite3
