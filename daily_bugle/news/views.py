@@ -21,7 +21,6 @@ def article(request, article_id):
         # category_id = models.ForeignKey(Category, on_delete=models.CASCADE) # Category ID - One -> One / One Articles -> One Category
 
         context = {
-            "pk": article.pk,
             "title": article.title,
             "text": article.text,
             "pub_date": article.pub_date,
