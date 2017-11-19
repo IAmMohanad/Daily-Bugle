@@ -29,8 +29,6 @@ class ArticleModelTests(TestCase):
         bresaola ball tip pork short loin frankfurter corned beef meatball. Turkey shoulder shankle, alcatra
         tri-tip brisket turducken chuck sausage kielbasa. Flank shankle leberkas alcatra shoulder pork."""
         pub_date = datetime.now()
-        author_id = 1
-        category_id = 1
 
         test_article = Article(title=title, text=text, pub_date=pub_date, author=test_user, category=test_category)
         test_article.save()
