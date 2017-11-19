@@ -14,7 +14,9 @@ urlpatterns = [
     # url(r'^user/(?P<user_id>[0-9]+)$', views.user, name='user'),
 
     # Article Page
-    url(r'^article/(?P<article_id>(-1|[0-9]+))$', views.article, name='article'),
+    url(r'^article/(?P<article_id>(new|[0-9]+))$', views.article, name='article'),
+    # New Article Page
+    url(r'^ajax/article/new$', views.article_add_new, name='article_add_new'),
     # Article filter by Category (Return list of Article IDs)
     url(r'^ajax/article/category/(?P<category_name>[a-zA-Z]+)$', views.article_category, name='article_category'),
 
