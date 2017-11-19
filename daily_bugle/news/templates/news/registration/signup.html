@@ -1,0 +1,33 @@
+{% extends 'news/base.html' %}
+
+{% block title %}signup{% endblock %}
+
+{% block content %}
+<div class="container">
+<h2>signup view</h2>
+<!--<form
+{{ form.as_p }}
+
+</form>-->
+
+<p> end form </p>
+<form action="/signup" method="post">
+{% csrf_token %}
+{%for field in form %}
+
+<div class="form-group">
+        <div class="form-text text-muted"> {{ field.errors }}</div>
+        <div class="col-form-label">{{ field.label_tag }}</div> <div class="form-control">{{ field }}</div>
+        {% if field.help_text%}
+        <p class="form-text text-muted">{{ field.help_text|safe }}</p>
+        {% endif %}
+</div>
+
+{% endfor %}
+<button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+
+</div>
+
+{% endblock %}
