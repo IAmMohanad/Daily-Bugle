@@ -11,8 +11,13 @@ from django.http import JsonResponse
 # Returns back one article object
 def article(request, article_id):
     if request.method == 'GET': # Only accept GET request
-        searchedArticle = Product.objects.filter(pk=article_id)
-        jsonResponse_searchedArticle = dict()
+        found_article_id = article_id # Allow category_name to be found_category_id for submitting error
+        try:
+            found_article_id = Article.objects.get(pk=article_id)
+        except Article.DoesNotExist:
+            # If category_name is not found
+            print("views.request: Invalid article searched! Article" + found_article_id + " does not exist.")
+            return HttpResponseBadRequest
 
         # -- Article Model Format --
         # title = models.CharField(max_length=255)
