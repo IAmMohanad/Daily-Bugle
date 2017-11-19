@@ -11,13 +11,7 @@ from django.http import JsonResponse
 # Returns back one article object
 def article(request, article_id):
     if request.method == 'GET': # Only accept GET request
-        found_article_object = article_id # Allow category_name to be found_category_id for submitting error
-        try:
-            found_article_object = Article.objects.get(pk=article_id)
-        except Article.DoesNotExist:
-            # If category_name is not found
-            print("views.request: Invalid article searched! Article" + found_article_object + " does not exist.")
-            return HttpResponseBadRequest
+        article = get_object_or_404(Article, pk=article_id)
 
         # -- Article Model Format --
         # title = models.CharField(max_length=255)
@@ -26,7 +20,7 @@ def article(request, article_id):
         # author_id = models.ForeignKey(User, on_delete=models.CASCADE) # User ID - Many -> One / Many Articles -> One author
         # category_id = models.ForeignKey(Category, on_delete=models.CASCADE) # Category ID - One -> One / One Articles -> One Category
 
-        article = {
+        context = {
             "pk": article.pk,
             "title": article.title,
             "text": article.text,
@@ -35,7 +29,7 @@ def article(request, article_id):
             "category_name": "Racing" # article.category_id
         }
 
-        return render(request, 'polls/article.html', article)
+        return render(request, 'news/article.html', context)
     else:
         print("views.request: Invalid request type made! Not a GET request.")
         return HttpResponseBadRequest
