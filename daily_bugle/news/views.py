@@ -26,16 +26,16 @@ def article(request, article_id):
         # author_id = models.ForeignKey(User, on_delete=models.CASCADE) # User ID - Many -> One / Many Articles -> One author
         # category_id = models.ForeignKey(Category, on_delete=models.CASCADE) # Category ID - One -> One / One Articles -> One Category
 
-        for article in searchedArticle:
-            jsonResponse_searchedArticle = {
+        article = {
             "pk": article.pk,
-            "title": article.name,
+            "title": article.title,
             "text": article.text,
-            "pub_date": article.description,
-            "author_id": article.price,
-            "category_id": article.price
-            }
-        return JsonResponse(jsonResponse_searchedArticle)
+            "pub_date": article.pub_date,
+            "author_name": "Jack", # article.author_id,
+            "category_name": "Racing" # article.category_id
+        }
+
+        return render(request, 'polls/article.html', article)
     else:
         print("views.request: Invalid request type made! Not a GET request.")
         return HttpResponseBadRequest
