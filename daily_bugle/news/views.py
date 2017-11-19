@@ -39,11 +39,12 @@ def article(request, article_id):
 # Returns back all articles within the given category
 def article_category(request, category_name):
     if request.method == 'GET': # Only accept GET request
+        found_category_id = category_name # Allow category_name to be found_category_id for submitting error
         try:
             found_category_id = Category.objects.get(name=category_name)
         except Category.DoesNotExist:
             # If category_name is not found
-            print("views.request: Invalid request made! The category being searched does not exist.")
+            print("views.request: Invalid category searched! " + found_category_id + " category does not exist.")
             return HttpResponseBadRequest
 
         searchedArticlesList = Article.objects.filter(category_id=found_category_id)
