@@ -1,5 +1,7 @@
 from django.conf.urls import url
 
+from . import views
+
 urlpatterns = [
     # # Index Page
     # url(r'^$', views.index, name='index'),
@@ -14,7 +16,7 @@ urlpatterns = [
     # Article Page
     url(r'^article/(?P<article_id>[0-9]+)$', views.article, name='article'),
     # Article filter by Category (Return list of Article IDs)
-    url(r'^ajax/article/category/(?P<category_name>[a-zA-Z]+$', views.article_category, name='article_category'),
+    url(r'^ajax/article/category/(?P<category_name>[a-zA-Z]+)$', views.article_category, name='article_category'),
 
     # # GET Like Object <- Fixed Regex
     # url(r'^ajax/article/(?P<article_id>[0-9]+)/likes$', views.likes, name='get_likes'), # GET - All Likes, POST - New Likes
