@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 
 # Imports all Models for Testing
 from .models import Article, Category, User
@@ -32,6 +32,6 @@ class ArticleModelTests(TestCase):
         author_id = 1
         category_id = 1
 
-        test_article = Article(title=title, text=text, pub_date=pub_date, author_id=test_user, category_id=test_category)
+        test_article = Article(title=title, text=text, pub_date=pub_date, author=test_user, category=test_category)
         test_article.save()
         # print(test_article.title, test_article.text, test_article.pub_date, test_article.author_id, test_article.category_id)
