@@ -1,0 +1,25 @@
+{% extends "news/index.html" %}
+{% load staticfiles %}
+{% block content %}
+<div class='main'>
+   <h3>Welcome!</h3>
+      <div class='second'>
+         <h3>Add new Comments below:</h3>
+         <form id=send method='POST' action="/Comments/">
+         	{% csrf_token %}
+            <span class='fieldname'>Comment</span>
+            <input type='text' maxlength='200' id='Name' name='name'>
+            <input type='submit' value='Add Comment'>
+         </form>
+      </div>
+      <div class='Like'>
+         <h3>Likes:</h3>
+            <input type='Button' value='Like' id='good'>
+            <input type='Button' value='Dislike' id ='bad'>
+            <p id='likes'></p>
+            <p id='dislikes'></p>
+      </div>
+</div>
+<script src="{% static 'news/jquery-1.11.2.js' %}"></script>
+<script src="{% static 'news/ajax.js' %}"></script>
+{% endblock %}

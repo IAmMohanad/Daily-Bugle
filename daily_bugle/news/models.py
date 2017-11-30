@@ -1,7 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.contrib.auth.models import AbstractUser
-# Create your models here.
 
 
 class UserManager(BaseUserManager):
@@ -71,9 +69,9 @@ class Article(models.Model):
 
 class Comment(models.Model):
     text = models.TextField()
-    author = models.ForeignKey(User) # User ID - Many -> One / Many Articles -> one author
-    pub_date = models.DateTimeField('date published')
-    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    author_id = models.ForeignKey(User) # User ID - Many -> One / Many Articles -> one author
+    pub_date = models.DateTimeField(auto_now_add=True)
+    article_id = models.ForeignKey(Article, on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.pk)

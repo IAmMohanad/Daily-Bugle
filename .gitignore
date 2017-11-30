@@ -2,4 +2,4 @@
 daily_bugle/**/__pycache__
 daily_bugle/**/*.pyc
 daily_bugle/news/migrations/*
-daily_bugle/db.sqlite3
+daily_bugle/**/db.sqlite3

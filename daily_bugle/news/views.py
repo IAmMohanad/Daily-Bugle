@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
-from django.http import HttpResponse, HttpResponseBadRequest, Http404, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, Http404, JsonResponse, QueryDict
 
 from django.template import loader
 
@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password, make_password
 # from django.contrib.auth.forms import UserCreationForm
 
+from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Article, Category, User, Comment, Like
@@ -145,3 +146,74 @@ def article_category(request, category_name):
     else:
         print("views.request: Not invalid request made! Not a GET request.")
         return HttpResponseBadRequest
+
+#
+# Comments and Likes
+#
+
+@csrf_exempt
+def comment(request, article_id):
+    if request.method == 'GET':
+      question = Comment.objects.filter(article_id_id=article_id)
+      print("inside GET")
+
+      AllComments = serializers.serialize("json", question)
+      return HttpResponse(AllComments, content_type='application/json')
+    if request.method=='POST':
+        print("inside post")
+        text = request.POST['text']
+        NewComment = Comment(text=text,article_id_id=article_id,author_id_id=1)
+        NewComment.save()
+        idOfComment = NewComment.id
+        data={
+            'text':text,
+            'id':idOfComment
+        }
+        return JsonResponse(data)
+
+@csrf_exempt
+def del_comment(request, article_id,comment_id):
+        if request.method=='DELETE':
+            Comment.objects.get(pk=comment_id).delete()
+            data={
+                'id':comment_id
+            }
+            return JsonResponse(data)
+
+def AllLikes(request, article_id):
+    if request.method == 'GET':
+        likes = Like.objects.filter(article_id_id=article_id, isLike=1)
+        Likescount = likes.count()
+        dislikes = Like.objects.filter(article_id_id=article_id, isLike=0)
+        dislikescount = dislikes.count()
+        print()
+        data={
+            'totalLikes':Likescount,
+            'totalDisLikes':dislikescount
+        }
+        return JsonResponse(data)
+
+
+@csrf_exempt
+def addorDislike(request, article_id, isLike):
+    author_id =request.POST['author_id']
+    if request.method == 'POST':
+        try:
+            check =Like.objects.get(article_id_id=article_id, author_id_id=author_id)
+            updateLike = Like.objects.filter(article_id_id=1,author_id_id=author_id).update(isLike=isLike)
+            print("addorDislike: GOOD")
+        except Like.DoesNotExist:
+            print("addorDislike: Is Caught")
+            NewLike = Like(isLike= isLike, pub_date='2017-1-23',article_id_id=1,author_id_id=author_id)
+            NewLike.save()
+
+    likes = Like.objects.filter(article_id_id=article_id, isLike=1)
+    Likescount = likes.count()
+    dislikes = Like.objects.filter(article_id_id=article_id, isLike=0)
+    dislikescount = dislikes.count()
+    print()
+    data={
+        'totalLikes':Likescount,
+        'totalDisLikes':dislikescount
+    }
+    return JsonResponse(data)
