@@ -14,9 +14,9 @@ urlpatterns = [
     # Login Page - Login
     url(r'^login$', views.login, name='login'),
     # Login Page - Logout
-    url(r'^/logout', auth_views.logout, name='logout'),
+    # url(r'^/logout', auth_views.logout, name='logout'),
     # User Page
-    url(r'^user/(?P<user_id>[0-9]+)$', views.user, name='user'),
+    # url(r'^user/(?P<user_id>[0-9]+)$', views.user, name='user'),
 
     # Article Page
     url(r'^article/(?P<article_id>(new|[0-9]+))$', views.article, name='article'),
