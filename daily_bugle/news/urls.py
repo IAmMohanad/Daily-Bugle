@@ -1,21 +1,29 @@
 from django.conf.urls import url
-from news import views
 
+from django.contrib import admin
+from django.contrib.auth import views as auth_views
+# from django.contrib.auth.views.login
+
+from . import views
 urlpatterns = [
     # Index Page
     url(r'^$', views.index, name='index'),
 
     # Sign Up Page
-    url(r'^/signup$', views.signup, name='signup'),
-    # Login Page
-    url(r'^/login$', views.login, name='login'),
+    url(r'^signup$', views.signup, name='signup'),
+    # Login Page - Login
+    url(r'^login$', views.login, name='login'),
+    # Login Page - Logout
+    url(r'^/logout', auth_views.logout, name='logout'),
     # User Page
-    url(r'^/user/(?P<user_id>[0-9]+)$', views.user, name='user'),
+    url(r'^user/(?P<user_id>[0-9]+)$', views.user, name='user'),
 
     # Article Page
-    url(r'^/article/(?P<article_id>[0-9]+)$', views.article, name='article'),
+    url(r'^article/(?P<article_id>(new|[0-9]+))$', views.article, name='article'),
+    # New Article Page
+    url(r'^ajax/article/new$', views.article_add_new, name='article_add_new'),
     # Article filter by Category (Return list of Article IDs)
-    url(r'^/ajax/article/category/(?P<category_name>[a-zA-Z]+$', views.article_category, name='article_category'),
+    url(r'^ajax/article/category/(?P<category_name>[a-zA-Z]+)$', views.article_category, name='article_category'),
 
     # GET Like Object <- Fixed Regex
     url(r'^ajax/article/(?P<article_id>[0-9]+)/likes$', views.AllLikes, name='get_ALLlikes'), # GET - All Likes, POST - New Likes
