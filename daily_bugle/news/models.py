@@ -7,14 +7,14 @@ class User(models.Model):
     password = models.CharField(max_length=255) # We need to store Hashed Password - Figure out later
     phone_number = models.CharField(max_length=20)
 
-    def __str__(self):
-        return self.email
+    # def __str__(self):
+    #     return self.email
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.pk
+    # def __str__(self):
+    #     return self.pk
 
 class Article(models.Model):
     title = models.CharField(max_length=255)
@@ -23,8 +23,8 @@ class Article(models.Model):
     author_id = models.ForeignKey(User, on_delete=models.CASCADE) # User ID - Many -> One / Many Articles -> One author
     category_id = models.ForeignKey(Category, on_delete=models.CASCADE) # Category ID - One -> One / One Articles -> One Category
 
-    def __str__(self):
-        return self.pk
+    # def __str__(self):
+    #     return self.pk
 
 class Comment(models.Model):
     text = models.TextField()
@@ -32,8 +32,6 @@ class Comment(models.Model):
     pub_date = models.DateTimeField('date published')
     article_id = models.ForeignKey(Article, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.pk
 
 class Like(models.Model):
     isLike = models.NullBooleanField()
@@ -41,5 +39,5 @@ class Like(models.Model):
     pub_date = models.DateTimeField('date published')
     article_id = models.ForeignKey(Article, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.pk
+    # def __str__(self):
+    #    return self.pk
