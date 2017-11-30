@@ -29,9 +29,9 @@ class Article(models.Model):
 class Comment(models.Model):
     text = models.TextField()
     author_id = models.ForeignKey(User) # User ID - Many -> One / Many Articles -> one author
-    pub_date = models.DateTimeField('date published')
+    pub_date = models.DateTimeField(auto_now_add=True)
     article_id = models.ForeignKey(Article, on_delete=models.CASCADE)
-
+    models.DateTimeField(auto_now_add=True)
 
 class Like(models.Model):
     isLike = models.NullBooleanField()

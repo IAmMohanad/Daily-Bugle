@@ -23,7 +23,7 @@ def comment(request, article_id):
     if request.method=='POST':
         print("inside post")
         text = request.POST['text']
-        NewComment = Comment(text=text, pub_date='2017-1-23',article_id_id=article_id,author_id_id=1)
+        NewComment = Comment(text=text,article_id_id=article_id,author_id_id=1)
         NewComment.save()
         idOfComment = NewComment.id
         data={
@@ -41,7 +41,7 @@ def del_comment(request, article_id,comment_id):
             }
             return JsonResponse(data)
 
-def likes(request, article_id):
+def AllLikes(request, article_id):
     if request.method == 'GET':
         likes = Like.objects.filter(article_id_id=article_id, isLike=1)
         Likescount = likes.count()
