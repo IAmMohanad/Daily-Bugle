@@ -4,6 +4,19 @@
 
 {% block content %}
 <h2>Index</h2>
+
+<div class="container">
+<!--<form
+{{ form.as_p }}
+
+</form>-->
+user is:
+{%if user%}
+...{{user.id}}
+<a href="http://127.0.0.1:8000/user/update">click me</a>
+
+<a href="http://127.0.0.1:8000/logout">log out</a>
+{%endif%}
 <!--<form method="post">
     {% csrf_token %}
     {{ form.as_p }}

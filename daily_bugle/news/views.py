@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
-from django.http import HttpResponse, HttpResponseBadRequest, Http404, JsonResponse, QueryDict
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, Http404, JsonResponse, QueryDict
 
 from django.template import loader
 
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login as loginUser, logout as logoutUser, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password, make_password
 # from django.contrib.auth.forms import UserCreationForm
@@ -12,7 +12,7 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Article, Category, User, Comment, Like
-from .forms import SignUpForm
+from .forms import SignUpForm, UserUpdateForm
 
 import os
 from datetime import datetime
@@ -24,8 +24,10 @@ from datetime import datetime
 @csrf_exempt
 @login_required
 def index(request):
-    #return HttpResponse("Hello, world. You're at the news index.")
     return render(request, 'news/index.html', {})
+    """# redirect to the value of next if it is entered,
+    otherwise to /accounts/profile/return
+    redirect(request.POST.get('next','/accounts/profile/'))"""
 
 @csrf_exempt
 def signup(request):
@@ -33,12 +35,17 @@ def signup(request):
         form = SignUpForm(request.POST)
         if(form.is_valid()):
             form.save()
-        return render(request, 'news/registration/signup.html', {'form':form})
+            user = authenticate(email = form.cleaned_data['email'], password = form.cleaned_data['password1'])
+            loginUser(request, user)
+            current_user = user
+            return render(request, 'news/index.html', {'user':user.id})
+        else:#not valid, return with errors
+            return render(request, 'news/registration/signup.html', {'form':form})
 
     if(request.method == "GET"):
         form = SignUpForm()
 
-    return render(request, 'news/registration/signup.html', {'form':SignUpForm})
+    return render(request, 'news/registration/signup.html', {'form':form})
 
 @csrf_exempt
 def login(request):
@@ -48,10 +55,48 @@ def login(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         user = authenticate(email = email, password = password)
+
         if(user is None):
             return render(request, 'news/registration/login.html', {'no_user':"Email does not exist"})
         else:
-            return render(request, 'news/index.html', {})
+            loginUser(request, user)
+            current_user = user.id
+            return render(request, 'news/index.html', {'user':current_user})
+            #next_url = request.GET.get('next')
+            #if next_url:
+            #    return HttpResponseRedirect(next_url)
+            #else:
+            #    return render(request, 'news/index.html', {'user':current_user})
+
+
+@csrf_exempt
+def logout(request):
+    logoutUser(request)
+    return redirect('/')
+    #return render(request, 'news/index.html', {})
+
+
+@csrf_exempt
+@login_required
+def updateProfile(request):
+    if(request.method == "GET"):
+        data = {'id' : request.user.id, 'email' : request.user.email, 'first_name' : request.user.first_name, 'last_name' : request.user.last_name, 'phone_number': request.user.phone_number}
+        form = UserUpdateForm(initial=data)
+        return render(request, 'news/updateProfile.html', {'form': form, 'user': request.user.id})
+    if(request.method == "POST"):
+        # get the model from the db
+        model, created = User.objects.get_or_create(pk = request.user.id)
+        # create the form based on the model, but with the request data overriding the model data
+        form = UserUpdateForm(request.POST, instance = model)
+
+        # save if valid
+        if form.is_valid():
+            form.save()
+            return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'success'})
+        else:
+            # will go to the the ajax error: data.responseText
+            return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'failed'})
+
 
 #
 # Article Views
