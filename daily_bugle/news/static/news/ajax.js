@@ -1,17 +1,17 @@
 $( document ).ready(function() {
 	$.ajax({
 	  type: 'GET',
-	  url: '/ajax/article/1/comments',
+	  url: '/article/1/comments',
 	  data : {
 	    'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 	  },
-	  success: LoadPageProducts,
+	  success: LoadPageComments,
 	  dataType: 'json',
 	  error:  printError
 	});
 	$.ajax({
 		type: 'GET',
-		url: 'ajax/article/1/likes',
+		url: '/article/1/likes',
 		data : {
 			'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 		},
@@ -23,7 +23,7 @@ $( document ).ready(function() {
 	$('#good').click(function(){
 
 		$.ajax({
-				url : "ajax/article/1/addorDislike/1",
+				url : "/article/1/addorDislike/1",
 				type : "POST",
 				data : {
 					'author_id': 15,
@@ -37,7 +37,7 @@ $( document ).ready(function() {
 $('#bad').click(function(){
 
 		$.ajax({
-				url : "ajax/article/1/addorDislike/0",
+				url : "/article/1/addorDislike/0",
 				type : "POST",
 				data : {
 					'author_id': 15,
@@ -59,7 +59,7 @@ $('#bad').click(function(){
 		console.log("this is the id of the comment " +pkval)
 		$.ajax({
 			type: 'DELETE',
-			url: '/ajax/article/1/comments/'+pkval,
+			url: '/article/1/comments/'+pkval,
 			data : {
 				'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 			},
@@ -71,20 +71,36 @@ $('#bad').click(function(){
 
 });
 
-function LoadPageProducts(data, textStatus, jqHXR){
-    for( i =0; i<Object.keys(data).length; i++)
-    {
-      console.log(data);
-      NameOfItem= data[i]['fields']['text'];
-			pk=data[i]['pk'];
-      console.log("id = "+ pk);
-      var div = $("<div id="+pk +">")
-      $("body").append(div);
-      var Name = $("<li id= 'name' ></li>").text("Comment: "+ NameOfItem.toString());
-      $("#"+pk).append(Name);
-      var DeleteButton=    "<input type= submit value= Delete name=DeleteButton>";
-      $("#"+pk).append(DeleteButton);
-  }
+function LoadPageComments(data, textStatus, jqHXR){
+	console.log(JSON.stringify(data));
+
+	$.each(data, function(i, comment) {
+		console.log(comment.text)
+		console.log("id = "+ comment.pk);
+
+		var div = $("<div id="+ comment.pk +">")
+
+		$("body").append(div);
+        var Name = $("<li id= 'name' ></li>").text("Comment: " + comment.text);
+        $("#"+comment.pk).append(Name);
+        var DeleteButton= "<input type= submit value= Delete name=DeleteButton>";
+        $("#"+comment.pk).append(DeleteButton);
+	})
+
+    // for( i =1; i<Object.keys(data).length; i++)
+    // {
+    //   console.log(data[i].text);
+	//
+    //   NameOfItem= data[i]['fields']['text'];
+	// 		pk=data[i]['pk'];
+    //   console.log("id = "+ pk);
+    //   var div = $("<div id="+pk +">")
+    //   $("comment").append(div);
+    //   var Name = $("<li id= 'name' ></li>").text("Comment: "+ NameOfItem.toString());
+    //   $("#"+pk).append(Name);
+    //   var DeleteButton= "<input type= submit value= Delete name=DeleteButton>";
+    //   $("#"+pk).append(DeleteButton);
+    // }
   }
 function SendComment() {
 		console.log("inside comments");
@@ -100,7 +116,7 @@ function SendComment() {
 
 	  });
 	    $.ajax({
-	        url : "ajax/article/1/comments",
+	        url : "/article/1/comments",
 	        type : "POST",
 	        data : {
 						'text':ListOfFormData['name'],

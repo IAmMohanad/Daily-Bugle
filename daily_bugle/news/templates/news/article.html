@@ -1,4 +1,38 @@
-<h1>{{ article.title }}</h1>
-<h4>{{ article.pub_date }} ~ {{ article.category_name }}</h4>
-<h3>By: {{ article.author_name }}</h3>
-<p>{{ article.text }}</p>
+{% extends "news/base.html" %}
+{% load staticfiles %}
+{% block content %}
+
+<div class='article'>
+    <h1>{{ article.title }}</h1>
+    <!-- H Line -->
+    <h4>{{ article.pub_date }} ~ {{ article.category_name }}</h4>
+    <h3>By: {{ article.author_name }}</h3>
+
+    <p>{{ article.text }}</p>
+    <p>
+        {{ article.pk }}
+    </p>
+</div>
+
+<div class='comment'>
+    <div class='second'>
+        <h3>Comments:</h3>
+        <form id=send method='POST' action="/article/{{ article.pk }}/comments">
+            {% csrf_token %}
+            <span class='fieldname'>Comment</span>
+            <input type='text' maxlength='200' id='Name' name='name'>
+            <input type='submit' value='Add Comment'>
+        </form>
+    </div>
+
+    <div class='Like'>
+        <h3>Likes:</h3>
+            <input type='Button' value='Like' id='good'>
+            <input type='Button' value='Dislike' id ='bad'>
+            <p id='likes'></p>
+            <p id='dislikes'></p>
+     </div>
+</div>
+
+<script src="{% static 'news/ajax.js' %}"></script>
+{% endblock %}

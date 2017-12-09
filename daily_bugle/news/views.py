@@ -73,10 +73,11 @@ def article(request, article_id):
         context = dict()
 
         context["article"] = {
+            "pk": found_article.pk,
             "title": found_article.title,
             "text": found_article.text,
             "pub_date": found_article.pub_date,
-            "author_name": found_article.author.full_name,
+            "author_name": found_article.author.first_name,
             "category_name": found_article.category.name
         }
 
@@ -134,12 +135,12 @@ def article_category(request, category_name):
         context = dict()
 
         for article in articles:
-            context[article.pk] = {
+            context[article] = {
                 "pk": article.pk,
                 "title": article.title,
                 "text": article.text,
                 "pub_date": article.pub_date,
-                "author_id": article.author_id,
+                "author_name": article.author.first_name,
                 "category_name": article.category.name
             }
         return JsonResponse(context)
@@ -154,14 +155,24 @@ def article_category(request, category_name):
 @csrf_exempt
 def comment(request, article_id):
     if request.method == 'GET':
-      question = Comment.objects.filter(article_id=article_id)
-      print("inside GET")
+        comments = get_list_or_404(Comment, pk=article_id)
 
-      AllComments = serializers.serialize("json", question)
-      return HttpResponse(AllComments, content_type='application/json')
+        context = dict()
+
+        for comment in comments:
+            context[comment.pk] = {
+                "pk": comment.pk,
+                "text": comment.text,
+                "pub_date": comment.pub_date
+            }
+            print("inside GET is: " + comment.text)
+
+        return JsonResponse(context)
+
     if request.method=='POST':
         print("inside post")
-        text = request.POST['text']
+        text = request.POST.get("name")
+        print("Inside Text: " + text)
         NewComment = Comment(text=text,article_id=article_id,author_id=1)
         NewComment.save()
         idOfComment = NewComment.id
