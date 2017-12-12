@@ -5,7 +5,7 @@ $( document ).ready(function() {
 	  data : {
 	    'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 	  },
-	  success: LoadPageComments,
+	  success: loadAllComments,
 	  dataType: 'json',
 	  error:  printError
 	});
@@ -26,7 +26,7 @@ $( document ).ready(function() {
 				url : "/article/1/addorDislike/1",
 				type : "POST",
 				data : {
-					'author_id': 15,
+					'author_id': 1,
 					'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 					},
 				success : GetAllLikes,
@@ -40,7 +40,7 @@ $('#bad').click(function(){
 				url : "/article/1/addorDislike/0",
 				type : "POST",
 				data : {
-					'author_id': 15,
+					'author_id': 1,
 					'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 					},
 				success : GetAllLikes,
@@ -50,7 +50,6 @@ $('#bad').click(function(){
 	});
 	$('#send').on('submit', function(event){
 		event.preventDefault();
-		console.log("sedfsdf");
 		SendComment();
 
 	});
@@ -71,49 +70,30 @@ $('#bad').click(function(){
 
 });
 
-function LoadPageComments(data, textStatus, jqHXR){
-	console.log(JSON.stringify(data));
-
+function loadAllComments(data, textStatus, jqHXR){
 	$.each(data, function(i, comment) {
-		console.log(comment.text)
-		console.log("id = "+ comment.pk);
-
 		var div = $("<div id="+ comment.pk +">")
-
 		$("body").append(div);
-        var Name = $("<li id= 'name' ></li>").text("Comment: " + comment.text);
-        $("#"+comment.pk).append(Name);
+		var Comment = $("<li id= 'Comment' ></li>").text("Comment: " + comment.text);
+        $("#"+comment.pk).append(Comment);
+		var AuthorName = $("<li id= 'AuthorName' ></li>").text("Author: " + comment.author);
+		$("#"+comment.pk).append(AuthorName);
+		var AuthorEmail = $("<li id= 'AuthorEmail' ></li>").text("email : " + comment.email);
+		$("#"+comment.pk).append(AuthorEmail);
+		var pub_date = $("<li id= 'pub_date' ></li>").text("Publication_date : " + comment.pub_date);
+		$("#"+comment.pk).append(pub_date);
         var DeleteButton= "<input type= submit value= Delete name=DeleteButton>";
         $("#"+comment.pk).append(DeleteButton);
 	})
 
-    // for( i =1; i<Object.keys(data).length; i++)
-    // {
-    //   console.log(data[i].text);
-	//
-    //   NameOfItem= data[i]['fields']['text'];
-	// 		pk=data[i]['pk'];
-    //   console.log("id = "+ pk);
-    //   var div = $("<div id="+pk +">")
-    //   $("comment").append(div);
-    //   var Name = $("<li id= 'name' ></li>").text("Comment: "+ NameOfItem.toString());
-    //   $("#"+pk).append(Name);
-    //   var DeleteButton= "<input type= submit value= Delete name=DeleteButton>";
-    //   $("#"+pk).append(DeleteButton);
-    // }
   }
 function SendComment() {
-		console.log("inside comments");
-		var $FormData = $('#send :input');
-		console.log("inside comments");
-
+	  var $FormData = $('#send :input');
 	  var ListOfFormData = {};
-		console.log("inside comments");
 
 	  $FormData.each(function() {
 	      ListOfFormData[this.name] = $(this).val();
-				console.log("inside comments values " +ListOfFormData[this.name]);
-
+		  console.log("List of type: "+this.name +" inside values " +ListOfFormData[this.name]);
 	  });
 	    $.ajax({
 	        url : "/article/1/comments",
@@ -122,33 +102,28 @@ function SendComment() {
 						'text':ListOfFormData['name'],
 						'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 					},
-	        success : addItem,
+	        success : AddComment,
 	        error : printError
 	  });
 	};
 function printError( req, status, err ) {
    console.log('An issue has occured See error --->', status, err)
   }
-function addItem(data, textStatus, jqHXR){
-		NameOfItem= data['text'];
+function AddComment(data, textStatus, jqHXR){
+		NewCommentAdded= data['text'];
 		pk=data['id'];
 		var div = $("<div id="+pk +">")
 		$("body").append(div);
-		var text = $("<li id= 'name' ></li>").text("name: "+ NameOfItem.toString());
-		$("#"+pk).append("<br>")
+		var text = $("<li id= 'name' ></li>").text("name: "+ NewCommentAdded.toString());
 		$("#"+pk).append(text);
 		var DeleteButton=    "<input type= submit value= Delete name=DeleteButton>";
 		$("#"+pk).append(DeleteButton);
-
 	}
 function deleteComment(data, textStatus, jqHXR){
 		var myNode = document.getElementById(data['id']);
 		$('#'+data['id']).remove();
 	}
 function GetAllLikes(data, textStatus, jqHXR){
-	console.log("likes" + data['totalLikes'])
-	console.log("likes" + data['totalDisLikes'])
 	$(".Like").find('#likes').text("Total Likes:"+ data['totalLikes']);
 	$(".Like").find('#dislikes').text("Total DisLikes:"+ data['totalDisLikes']);
-
 }

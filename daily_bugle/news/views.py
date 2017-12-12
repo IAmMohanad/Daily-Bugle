@@ -16,10 +16,37 @@ from .forms import SignUpForm
 
 import os
 from datetime import datetime
-
+from rest_framework import viewsets
+from .serializers import ArticleSerializer,UserSerializer,CommentSerializer,CategorySerializer
 #
 # User Views
 #
+
+
+class ArticleViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Article.objects.all()
+    serializer_class = ArticleSerializer
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+class CommentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+class CategoryViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 @csrf_exempt
 @login_required
@@ -152,26 +179,43 @@ def article_category(request, category_name):
 # Comments and Likes
 #
 
+
+def findUser(author_id):
+    print ("author id is "+ str(author_id))
+    user = User.objects.get(id=1)
+    print (user)
+    first_name= user.first_name
+    userInfo ={
+            'First_name':user.first_name,
+            'last_name':user.last_name,
+            'email':user.email
+    }
+    return userInfo
 @csrf_exempt
 def comment(request, article_id):
-    if request.method == 'GET':
-        comments = get_list_or_404(Comment, pk=article_id)
 
+    if request.method == 'GET':
+
+        comments = get_list_or_404(Comment, article_id=article_id)
+        print ("jfdjfld helloplp")
         context = dict()
 
         for comment in comments:
             context[comment.pk] = {
                 "pk": comment.pk,
                 "text": comment.text,
-                "pub_date": comment.pub_date
+                "pub_date": comment.pub_date.strftime("%d, %b %Y"),
+                "author": findUser(comment.author_id)["First_name"],
+                "email":findUser(comment.author_id)["email"]
             }
-            print("inside GET is: " + comment.text)
 
         return JsonResponse(context)
 
     if request.method=='POST':
         print("inside post")
-        text = request.POST.get("name")
+        RequestData = QueryDict(request.body)#Querydict is used to retrived the new price of the ITEM
+        text= RequestData.get('text')
+        #text = request.POST.get("name")
         print("Inside Text: " + text)
         NewComment = Comment(text=text,article_id=article_id,author_id=1)
         NewComment.save()

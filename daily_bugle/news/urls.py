@@ -3,9 +3,21 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 # from django.contrib.auth.views.login
+from rest_framework import routers
 
 from . import views
+from django.conf.urls import include, url
+
+
+router = routers.DefaultRouter()
+router.register(r'Article', views.ArticleViewSet)
+router.register(r'User', views.UserViewSet)
+router.register(r'Comment', views.CommentViewSet)
+router.register(r'Category', views.CategoryViewSet)
+
+
 urlpatterns = [
+    url(r'^api/', include(router.urls)),
     # Index Page
     url(r'^$', views.index, name='index'),
 
