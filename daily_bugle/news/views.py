@@ -18,10 +18,37 @@ from .forms import SignUpForm, UserUpdateForm
 
 import os
 from datetime import datetime
-
+from rest_framework import viewsets
+from .serializers import ArticleSerializer,UserSerializer,CommentSerializer,CategorySerializer
 #
 # User Views
 #
+
+
+class ArticleViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Article.objects.all()
+    serializer_class = ArticleSerializer
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+class CommentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+class CategoryViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 @csrf_exempt
 #@login_required
@@ -147,10 +174,11 @@ def article(request, article_id):
         context = dict()
 
         context["article"] = {
+            "pk": found_article.pk,
             "title": found_article.title,
             "text": found_article.text,
             "pub_date": found_article.pub_date,
-            "author_name": found_article.author.full_name,
+            "author_name": found_article.author.first_name,
             "category_name": found_article.category.name
         }
 
@@ -208,12 +236,12 @@ def article_category(request, category_name):
         context = dict()
 
         for article in articles:
-            context[article.pk] = {
+            context[article] = {
                 "pk": article.pk,
                 "title": article.title,
                 "text": article.text,
                 "pub_date": article.pub_date,
-                "author_name": article.author.full_name,
+                "author_name": article.author.first_name,
                 "category_name": article.category.name
             }
         return JsonResponse(context)
@@ -225,18 +253,45 @@ def article_category(request, category_name):
 # Comments and Likes
 #
 
+
+def findUser(author_id):
+    print ("author id is "+ str(author_id))
+    user = User.objects.get(id=1)
+    print (user)
+    first_name= user.first_name
+    userInfo ={
+            'First_name':user.first_name,
+            'last_name':user.last_name,
+            'email':user.email
+    }
+    return userInfo
 @csrf_exempt
 def comment(request, article_id):
-    if request.method == 'GET':
-      question = Comment.objects.filter(article_id_id=article_id)
-      print("inside GET")
 
-      AllComments = serializers.serialize("json", question)
-      return HttpResponse(AllComments, content_type='application/json')
+    if request.method == 'GET':
+
+        comments = get_list_or_404(Comment, article_id=article_id)
+        print ("jfdjfld helloplp")
+        context = dict()
+
+        for comment in comments:
+            context[comment.pk] = {
+                "pk": comment.pk,
+                "text": comment.text,
+                "pub_date": comment.pub_date.strftime("%d, %b %Y"),
+                "author": findUser(comment.author_id)["First_name"],
+                "email":findUser(comment.author_id)["email"]
+            }
+
+        return JsonResponse(context)
+
     if request.method=='POST':
         print("inside post")
-        text = request.POST['text']
-        NewComment = Comment(text=text,article_id_id=article_id,author_id_id=1)
+        RequestData = QueryDict(request.body)#Querydict is used to retrived the new price of the ITEM
+        text= RequestData.get('text')
+        #text = request.POST.get("name")
+        print("Inside Text: " + text)
+        NewComment = Comment(text=text,article_id=article_id,author_id=1)
         NewComment.save()
         idOfComment = NewComment.id
         data={
@@ -256,9 +311,9 @@ def del_comment(request, article_id,comment_id):
 
 def AllLikes(request, article_id):
     if request.method == 'GET':
-        likes = Like.objects.filter(article_id_id=article_id, isLike=1)
+        likes = Like.objects.filter(article_id=article_id, isLike=1)
         Likescount = likes.count()
-        dislikes = Like.objects.filter(article_id_id=article_id, isLike=0)
+        dislikes = Like.objects.filter(article_id=article_id, isLike=0)
         dislikescount = dislikes.count()
         print()
         data={
@@ -273,17 +328,17 @@ def addorDislike(request, article_id, isLike):
     author_id =request.POST['author_id']
     if request.method == 'POST':
         try:
-            check =Like.objects.get(article_id_id=article_id, author_id_id=author_id)
-            updateLike = Like.objects.filter(article_id_id=1,author_id_id=author_id).update(isLike=isLike)
+            check =Like.objects.get(article_id=article_id, author_id=author_id)
+            updateLike = Like.objects.filter(article_id=1,author_id=author_id).update(isLike=isLike)
             print("addorDislike: GOOD")
         except Like.DoesNotExist:
             print("addorDislike: Is Caught")
-            NewLike = Like(isLike= isLike, pub_date='2017-1-23',article_id_id=1,author_id_id=author_id)
+            NewLike = Like(isLike= isLike, pub_date='2017-1-23',article_id=1,author_id=author_id)
             NewLike.save()
 
-    likes = Like.objects.filter(article_id_id=article_id, isLike=1)
+    likes = Like.objects.filter(article_id=article_id, isLike=1)
     Likescount = likes.count()
-    dislikes = Like.objects.filter(article_id_id=article_id, isLike=0)
+    dislikes = Like.objects.filter(article_id=article_id, isLike=0)
     dislikescount = dislikes.count()
     print()
     data={
