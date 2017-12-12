@@ -3,10 +3,10 @@
 {% block title %}profile{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="row">
 <h2>User update profile view</h2>
 {%if user%}
-{{user.id}}
+{{user}}
 {%endif%}
 <p></p>
 {%if saved%}
@@ -14,8 +14,6 @@
 {%endif%}
 
 
-
-<p> end form </p>
 <form action="/user/update" method="post">
 {% csrf_token %}
 {%for field in form %}

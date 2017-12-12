@@ -9,10 +9,12 @@ from django.contrib.auth.hashers import check_password, make_password
 # from django.contrib.auth.forms import UserCreationForm
 
 from django.core import serializers
+
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Article, Category, User, Comment, Like
 from .forms import SignUpForm, UserUpdateForm
+
 
 import os
 from datetime import datetime
@@ -22,9 +24,17 @@ from datetime import datetime
 #
 
 @csrf_exempt
-@login_required
+#@login_required
 def index(request):
-    return render(request, 'news/index.html', {})
+    #articlesList = getArticles()
+    print("hellooo")
+    context = {}
+    context["articlesList"] = getArticles()
+
+    #if request.user.is_authenticated():
+        #context["user"] = request.user
+
+    return render(request, 'news/index.html', context)
     """# redirect to the value of next if it is entered,
     otherwise to /accounts/profile/return
     redirect(request.POST.get('next','/accounts/profile/'))"""
@@ -32,6 +42,7 @@ def index(request):
 @csrf_exempt
 def signup(request):
     if(request.method == "POST"):
+        #if form is valid, authenticate use and log them in.
         form = SignUpForm(request.POST)
         if(form.is_valid()):
             form.save()
@@ -42,6 +53,7 @@ def signup(request):
         else:#not valid, return with errors
             return render(request, 'news/registration/signup.html', {'form':form})
 
+    #return empty sign up form
     if(request.method == "GET"):
         form = SignUpForm()
 
@@ -61,7 +73,8 @@ def login(request):
         else:
             loginUser(request, user)
             current_user = user.id
-            return render(request, 'news/index.html', {'user':current_user})
+            return redirect('/')
+            #return render(request, 'news/index.html', {'user':current_user})
             #next_url = request.GET.get('next')
             #if next_url:
             #    return HttpResponseRedirect(next_url)
@@ -73,7 +86,6 @@ def login(request):
 def logout(request):
     logoutUser(request)
     return redirect('/')
-    #return render(request, 'news/index.html', {})
 
 
 @csrf_exempt
@@ -92,7 +104,7 @@ def updateProfile(request):
         # save if valid
         if form.is_valid():
             form.save()
-            return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'success'})
+            return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'success', 'user': request.user.id})
         else:
             # will go to the the ajax error: data.responseText
             return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'failed'})
@@ -101,6 +113,23 @@ def updateProfile(request):
 #
 # Article Views
 #
+
+def getArticles():
+    total_articles = Article.objects.all().count()
+    articles = Article.objects.order_by("-pk")[:5] #.objects.all()
+
+    articlesList = []
+
+    for article in articles:
+        articlesList.append({
+            "id": article.pk,
+            "title": article.title,
+            "text": article.text,
+            "pub_date": article.pub_date
+            #"author_name": article.author.first_name,
+            #"category_name": article.category.name
+        })
+    return articlesList
 
 # views.request
 # Returns back one article object
