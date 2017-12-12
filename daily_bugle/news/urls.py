@@ -21,10 +21,14 @@ urlpatterns = [
     # Index Page
     url(r'^$', views.index, name='index'),
 
+    url(r'^accounts/login/$', views.login, name='index'),
+
     # Sign Up Page
     url(r'^signup$', views.signup, name='signup'),
     # Login Page - Login
     url(r'^login$', views.login, name='login'),
+    url(r'^logout$', views.logout, name='logout'),
+    url(r'^user/update$', views.updateProfile, name='userUpdate'),
     # Login Page - Logout
     # url(r'^/logout', auth_views.logout, name='logout'),
     # User Page

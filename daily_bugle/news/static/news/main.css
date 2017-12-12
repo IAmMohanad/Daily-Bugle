@@ -1,0 +1,44 @@
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 40px;
+}
+
+.cd-fixed-bg {
+	/*min-height: 100%;
+	background-size: cover;*/
+	background-attachment: fixed;
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
+#main_container{
+  /*height: calc(100% - 40px);*/
+  min-height: calc(100% - 40px);
+}
+
+hr.divider{
+  border-top: 2px dashed #8c8b8b;
+}
+
+.divider1 {
+  style: dotted;
+  height: 1px;
+  width:100%;
+  display:block; /* for use on default inline elements like span */
+  margin: 9px 0;
+  overflow: hidden;
+  background-color: #000000;
+}
+
+/* unvisited link */
+a.article_link:link {
+    color: red;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 20px;
+}
