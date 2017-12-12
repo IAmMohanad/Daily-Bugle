@@ -25,23 +25,37 @@
       <nav class="navbar navbar-default">
         <div class="container">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="#">Page 1</a></li>
-            <li><a href="#">Page 2</a></li>
-            <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" href="#">Categories
-              <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Page 1-1</a></li>
-              </ul>
-            </li>
+            <li class="active"><a href="/">Home</a></li>
+            {% if currentPage == "index" %}
+              <li><a href="#">Business</a></li>
+              <li><a href="#">World</a></li>
+              <li><a href="#">Sport</a></li>
+              <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Categories
+                <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Business</a></li>
+                  <li><a href="#">World</a></li>
+                  <li><a href="#">Sport</a></li>
+                </ul>
+              </li>
+            {% endif %}
           </ul>
-          {% if not user.is_authenticated %}
-            <ul class="nav navbar-nav navbar-right">
-              <li><a href="/signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-              <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-            </ul>
-          {% endif %}
+          <ul class="nav navbar-nav navbar-right">
+            {% if not user.is_authenticated %}
+              <li><a href="/signup"><span class="glyphicon glyphicon-sign-up"></span>Sign Up</a></li>
+              <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span>Login</a></li>
+            {% else %}
+              <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Settings
+                <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="/user/update">Profile</a></li>
+                  <li><a href="/logout">Log out</a></li>
+                </ul>
+              </li>
+            {% endif %}
+          </ul>
         </div>
       </nav>
       {% block content %}

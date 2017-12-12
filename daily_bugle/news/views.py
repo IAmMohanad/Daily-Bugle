@@ -27,9 +27,9 @@ from datetime import datetime
 #@login_required
 def index(request):
     #articlesList = getArticles()
-    print("hellooo")
     context = {}
     context["articlesList"] = getArticles()
+    context["currentPage"] = "index"
 
     #if request.user.is_authenticated():
         #context["user"] = request.user
@@ -94,7 +94,7 @@ def updateProfile(request):
     if(request.method == "GET"):
         data = {'id' : request.user.id, 'email' : request.user.email, 'first_name' : request.user.first_name, 'last_name' : request.user.last_name, 'phone_number': request.user.phone_number}
         form = UserUpdateForm(initial=data)
-        return render(request, 'news/updateProfile.html', {'form': form, 'user': request.user.id})
+        return render(request, 'news/updateProfile.html', {'form': form, 'user': request.user, "currentPage": "index"})
     if(request.method == "POST"):
         # get the model from the db
         model, created = User.objects.get_or_create(pk = request.user.id)
