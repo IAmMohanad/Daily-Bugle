@@ -15,6 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Article, Category, User, Comment, Like
 from .forms import SignUpForm, UserUpdateForm
 
+from rest_framework.permissions import IsAuthenticated
 
 import os
 from datetime import datetime
@@ -25,28 +26,45 @@ from .serializers import ArticleSerializer,UserSerializer,CommentSerializer,Cate
 #
 
 
+
 class ArticleViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
+    #permission_classes = (IsAuthenticated,)
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
+    '''def get_queryset(self):
+        return Article.objects.filter(id=self.request.user.id)
+'''
+    '''def perform_create(self, serializer):
+        permission_classes = (IsAuthenticated,)
+
+        print("jfedjflkjflkdjsflkdsaf")
+        serializer.save(id=self.request.user.id)
+        serializer.data.Author = self.request.user.id
+        super(ArticleViewSet, self).perform_create(serializer)'''
+
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
+    permission_classes = (IsAuthenticated,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
 class CommentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
+    permission_classes = (IsAuthenticated,)
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 class CategoryViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
+    permission_classes = (IsAuthenticated,)
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
@@ -255,9 +273,7 @@ def article_category(request, category_name):
 
 
 def findUser(author_id):
-    print ("author id is "+ str(author_id))
-    user = User.objects.get(id=1)
-    print (user)
+    user = User.objects.get(id=author_id)
     first_name= user.first_name
     userInfo ={
             'First_name':user.first_name,
@@ -265,39 +281,47 @@ def findUser(author_id):
             'email':user.email
     }
     return userInfo
+
+@login_required
 @csrf_exempt
 def comment(request, article_id):
-
     if request.method == 'GET':
-
         comments = get_list_or_404(Comment, article_id=article_id)
-        print ("jfdjfld helloplp")
         context = dict()
-
         for comment in comments:
             context[comment.pk] = {
                 "pk": comment.pk,
                 "text": comment.text,
-                "pub_date": comment.pub_date.strftime("%d, %b %Y"),
+                "pub_date": comment.pub_date,
                 "author": findUser(comment.author_id)["First_name"],
                 "email":findUser(comment.author_id)["email"]
             }
-
         return JsonResponse(context)
 
     if request.method=='POST':
-        print("inside post")
+        current_user= request.user
         RequestData = QueryDict(request.body)#Querydict is used to retrived the new price of the ITEM
         text= RequestData.get('text')
         #text = request.POST.get("name")
-        print("Inside Text: " + text)
-        NewComment = Comment(text=text,article_id=article_id,author_id=1)
+        NewComment = Comment(text=text,article_id=article_id,author_id=current_user.id)
         NewComment.save()
         idOfComment = NewComment.id
-        data={
-            'text':text,
-            'id':idOfComment
+        commentsObj = get_object_or_404(Comment, id=idOfComment)
+        context = dict()
+        print ("object primary key is ")
+        print ("object primary key is "+ NewComment.text)
+        data = {
+            "pk": NewComment.pk,
+            "text": NewComment.text,
+            "pub_date": NewComment.pub_date,
+            "author": findUser(NewComment.author_id)["First_name"],
+            "email":findUser(NewComment.author_id)["email"]
         }
+
+        #data={
+        #    'text':text,
+        #    'id':idOfComment
+        #}
         return JsonResponse(data)
 
 @csrf_exempt
@@ -321,19 +345,16 @@ def AllLikes(request, article_id):
             'totalDisLikes':dislikescount
         }
         return JsonResponse(data)
-
-
 @csrf_exempt
 def addorDislike(request, article_id, isLike):
-    author_id =request.POST['author_id']
+    current_user= request.user
     if request.method == 'POST':
         try:
-            check =Like.objects.get(article_id=article_id, author_id=author_id)
-            updateLike = Like.objects.filter(article_id=1,author_id=author_id).update(isLike=isLike)
-            print("addorDislike: GOOD")
+            print ("user id is "+str(current_user.id))
+            check =Like.objects.get(article_id=article_id, author_id=current_user.id)
+            updateLike = Like.objects.filter(article_id=article_id,author_id=current_user.id).update(isLike=isLike)
         except Like.DoesNotExist:
-            print("addorDislike: Is Caught")
-            NewLike = Like(isLike= isLike, pub_date='2017-1-23',article_id=1,author_id=author_id)
+            NewLike = Like(isLike= isLike, pub_date='2017-1-23',article_id=article_id,author_id=current_user.id)
             NewLike.save()
 
     likes = Like.objects.filter(article_id=article_id, isLike=1)

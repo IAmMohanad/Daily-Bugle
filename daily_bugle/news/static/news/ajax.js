@@ -1,7 +1,8 @@
 $( document ).ready(function() {
+    var Article_ID_Value = ''+article_idd;
 	$.ajax({
 	  type: 'GET',
-	  url: '/article/1/comments',
+	  url: '/article/'+Article_ID_Value+'/comments',
 	  data : {
 	    'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 	  },
@@ -11,7 +12,7 @@ $( document ).ready(function() {
 	});
 	$.ajax({
 		type: 'GET',
-		url: '/article/1/likes',
+		url: '/article/'+Article_ID_Value+'/likes',
 		data : {
 			'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 		},
@@ -23,10 +24,9 @@ $( document ).ready(function() {
 	$('#good').click(function(){
 
 		$.ajax({
-				url : "/article/1/addorDislike/1",
+				url : "/article/"+Article_ID_Value+"/addorDislike/1",
 				type : "POST",
 				data : {
-					'author_id': 1,
 					'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 					},
 				success : GetAllLikes,
@@ -37,10 +37,9 @@ $( document ).ready(function() {
 $('#bad').click(function(){
 
 		$.ajax({
-				url : "/article/1/addorDislike/0",
+				url : "/article/"+Article_ID_Value+"/addorDislike/0",
 				type : "POST",
 				data : {
-					'author_id': 1,
 					'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 					},
 				success : GetAllLikes,
@@ -50,7 +49,7 @@ $('#bad').click(function(){
 	});
 	$('#send').on('submit', function(event){
 		event.preventDefault();
-		SendComment();
+		SendComment(Article_ID_Value);
 
 	});
 	$(document).on('click',"[name='DeleteButton']",function(){//I am using the JQuery 'on' as the button 'DeleteButton' is added dynmaically inside the fucntion 'LoadPageProducts'
@@ -58,7 +57,7 @@ $('#bad').click(function(){
 		console.log("this is the id of the comment " +pkval)
 		$.ajax({
 			type: 'DELETE',
-			url: '/article/1/comments/'+pkval,
+			url: '/article/'+Article_ID_Value+'/comments/'+pkval,
 			data : {
 				'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 			},
@@ -71,6 +70,7 @@ $('#bad').click(function(){
 });
 
 function loadAllComments(data, textStatus, jqHXR){
+	console.log("lfldkjldkf")
 	$.each(data, function(i, comment) {
 		var div = $("<div id="+ comment.pk +">")
 		$("#commentsContainer").append(div);
@@ -89,7 +89,7 @@ function loadAllComments(data, textStatus, jqHXR){
 		})
   }
 
-function SendComment() {
+function SendComment(Article_ID_Value) {
 	  var $FormData = $('#send :input');
 	  var ListOfFormData = {};
 
@@ -97,8 +97,9 @@ function SendComment() {
 	      ListOfFormData[this.name] = $(this).val();
 		  console.log("List of type: "+this.name +" inside values " +ListOfFormData[this.name]);
 	  });
+	  console.log("we are here")
 	    $.ajax({
-	        url : "/article/1/comments",
+	        url : "/article/"+Article_ID_Value+"/comments",
 	        type : "POST",
 	        data : {
 						'text':ListOfFormData['name'],
@@ -112,17 +113,35 @@ function printError( req, status, err ) {
    console.log('An issue has occured See error --->', status, err)
   }
 function AddComment(data, textStatus, jqHXR){
-		NewCommentAdded= data['text'];
-		pk=data['id'];
-		var div = $("<div id="+pk +">")
-		$("body").append(div);
-		var text = $("<li id= 'name' ></li>").text("name: "+ NewCommentAdded.toString());
-		$("#"+pk).append(text);
-		var DeleteButton=    "<input type= submit value= Delete name=DeleteButton>";
-		$("#"+pk).append(DeleteButton);
-	}
+   /* 
+      NewCommentAdded= data['text'];
+      pk=data['id'];
+      var div = $("<div id="+pk +">")
+      $("body").append(div);
+      var text = $("<li id= 'name' ></li>").text("name: "+ NewCommentAdded.toString());
+      $("#"+pk).append(text);
+      var DeleteButton=    "<input type= submit value= Delete name=DeleteButton>";
+      $("#"+pk).append(DeleteButton);
+    }
+  */
+	console.log(data)
+	var div = $("<div id="+ data['pk'] +"></div>")
 
+		$("#"+data['pk']).append('<ul class="list-group">');
+		$("#body").append(div);
+		var comment = $("<textarea class='list-group-item' disabled='true' id= 'Comment' ></textarea>").text(data['text']);
+	    $("#"+data['pk']).append(comment);
+		var AuthorName = $("<li class='list-group-item' id= 'AuthorName' ></li>").text("Author: " + data['author']);
+		$("#"+data['pk']).append(AuthorName);
+		var AuthorEmail = $("<li class='list-group-item' id= 'AuthorEmail' ></li>").text("email : " + data['email']);
+		$("#"+data['pk']).append(AuthorEmail);
+		var pub_date = $("<li class='list-group-item' id= 'pub_date' ></li>").text("Publication_date : " + data['pub_date']);
+		$("#"+data['pk']).append(pub_date);
+	    var DeleteButton= "<button type='submit' class='btn btn-default' value='Delete' name='DeleteButton>'";
+	    $("#"+data['pk']).append(DeleteButton);
+		$("#"+data['pk']).append('</ul>');
 
+}
 
 function deleteComment(data, textStatus, jqHXR){
 		var myNode = document.getElementById(data['id']);
