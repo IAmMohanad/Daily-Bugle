@@ -73,20 +73,22 @@ $('#bad').click(function(){
 function loadAllComments(data, textStatus, jqHXR){
 	$.each(data, function(i, comment) {
 		var div = $("<div id="+ comment.pk +">")
-		$("body").append(div);
-		var Comment = $("<li id= 'Comment' ></li>").text("Comment: " + comment.text);
+		$("#commentsContainer").append(div);
+		$("#"+comment.pk).append('<ul class="list-group">');
+			var Comment = $("<textarea id='Comment' disabled='true' class='form-control'></textarea>").text(comment.text);
         $("#"+comment.pk).append(Comment);
-		var AuthorName = $("<li id= 'AuthorName' ></li>").text("Author: " + comment.author);
-		$("#"+comment.pk).append(AuthorName);
-		var AuthorEmail = $("<li id= 'AuthorEmail' ></li>").text("email : " + comment.email);
-		$("#"+comment.pk).append(AuthorEmail);
-		var pub_date = $("<li id= 'pub_date' ></li>").text("Publication_date : " + comment.pub_date);
-		$("#"+comment.pk).append(pub_date);
-        var DeleteButton= "<input type= submit value= Delete name=DeleteButton>";
-        $("#"+comment.pk).append(DeleteButton);
-	})
-
+			var AuthorName = $("<li class='list-group-item' id= 'AuthorName' ></li>").text("Author: " + comment.author);
+				$("#"+comment.pk).append(AuthorName);
+			var AuthorEmail = $("<li class='list-group-item' id= 'AuthorEmail' ></li>").text("email : " + comment.email);
+				$("#"+comment.pk).append(AuthorEmail);
+			var pub_date = $("<li class='list-group-item' id='pub_date' ></li>").text("Publication_date : " + comment.pub_date);
+				$("#"+comment.pk).append(pub_date);
+	    var DeleteButton= '<button type="submit" class="btn btn-warning deleteComment" name="DeleteButton">Delete</button>';
+	      $("#"+comment.pk).append(DeleteButton);
+		$("#"+comment.pk).append('</ul>');
+		})
   }
+
 function SendComment() {
 	  var $FormData = $('#send :input');
 	  var ListOfFormData = {};
@@ -119,6 +121,9 @@ function AddComment(data, textStatus, jqHXR){
 		var DeleteButton=    "<input type= submit value= Delete name=DeleteButton>";
 		$("#"+pk).append(DeleteButton);
 	}
+
+
+
 function deleteComment(data, textStatus, jqHXR){
 		var myNode = document.getElementById(data['id']);
 		$('#'+data['id']).remove();

@@ -1,37 +1,49 @@
 {% extends "news/base.html" %}
 {% load staticfiles %}
 {% block content %}
+<div class="row">
+  <div class="col-md-10 col-md-offset-1">
+    <div class='article'>
+        <h1>{{ article.title }}</h1>
+        <!-- H Line -->
+        <h4>{{ article.pub_date }} ~ {{ article.category_name }}</h4>
+        <h3>By: {{ article.author_name }}</h3>
 
-<div class='article'>
-    <h1>{{ article.title }}</h1>
-    <!-- H Line -->
-    <h4>{{ article.pub_date }} ~ {{ article.category_name }}</h4>
-    <h3>By: {{ article.author_name }}</h3>
-
-    <p>{{ article.text }}</p>
-    <p>
-        {{ article.pk }}
-    </p>
-</div>
-
-<div class='comment'>
-    <div class='second'>
-        <h3>Comments:</h3>
-        <form id=send method='POST' action="/article/{{ article.pk }}/comments">
-            {% csrf_token %}
-            <span class='fieldname'>Comment</span>
-            <input type='text' maxlength='200' id='Name' name='name'>
-            <input type='submit' value='Add Comment'>
-        </form>
+        <p>{{ article.text }}</p>
+        <p>
+            {{ article.pk }}
+        </p>
     </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-10 col-md-offset-1">
+    <div class='comment'>
+        <div class='second'>
+            <h3>Comments:</h3>
+            <form id=send method='POST' action="/article/{{ article.pk }}/comments">
+                {% csrf_token %}
+                <label for="name" class='fieldname'>Comment</label>
+                <textarea class="form-control" rows="5" maxlength='200' id='Name' name='name'></textarea>
+                <input type='submit' class="btn btn-default" value='Add Comment'>
+            </form>
+        </div>
 
-    <div class='Like'>
-        <h3>Likes:</h3>
-            <input type='Button' value='Like' id='good'>
-            <input type='Button' value='Dislike' id ='bad'>
-            <p id='likes'></p>
-            <p id='dislikes'></p>
-     </div>
+        <div class='Like'>
+            <h3>Likes:</h3>
+                <button type="button" class="btn btn-success" value='Like' id='good'>like</button>
+                <button type="button" class="btn btn-danger" value='Dislike' id ='bad'>dislike</button>
+                <p id='likes'></p>
+                <p id='dislikes'></p>
+         </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-10 col-md-offset-1">
+    <div class="comments" id="commentsContainer">
+    </div>
+  </div>
 </div>
 
 <script src="{% static 'news/ajax.js' %}"></script>
