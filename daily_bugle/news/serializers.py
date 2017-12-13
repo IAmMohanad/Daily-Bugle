@@ -1,32 +1,35 @@
 from .models import Article, User,Category,Comment,Article
 from rest_framework import serializers
 
+class RecursiveField(serializers.Serializer):
+    def to_representation(self, value):
+        serializer = self.parent.parent.__class__(value, context=self.context)
+        return serializer.data
 
 class ArticleSerializer(serializers.HyperlinkedModelSerializer):
-    category = serializers.PrimaryKeyRelatedField(many=False, read_only=False,queryset=Category.objects.all())
+    #category = serializers.PrimaryKeyRelatedField(many=False, read_only=False,queryset=Category.objects.all())
     #author = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
-    author = serializers.HyperlinkedRelatedField(
-        many=False,
-        read_only=True,
-        view_name='user-detail'
-    )
-    category = serializers.HyperlinkedRelatedField(
-        many=False,
-        read_only=True,
-        view_name='category-detail'
-    )
+    #author = serializers.HyperlinkedRelatedField(
+        #many=False,
+        #read_only=True,
+        #view_name='user-detail'
+    #)
+
+    #category = serializers.HyperlinkedRelatedField(
+    #    many=False,
+    #    read_only=True,
+    #    view_name='category-detail'
+    #)
+
     comments =  serializers.HyperlinkedRelatedField(
         many=True,
         read_only=True,
-        view_name='comment-detail'
+        view_name='comment-detail',
     )
     class Meta:
         model = Article
-        fields = ('author','title', 'text','category','pub_date','comments')
-    def to_representation(self, obj):
-        data = super().to_representation(obj)
-        request = self.context["request"]
-        return data
+        fields = ('url','author','title', 'text','category','pub_date','comments')
+
 
 class UserSerializer(serializers.ModelSerializer):
     articles =  serializers.HyperlinkedRelatedField(
@@ -41,12 +44,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
-    author = serializers.HyperlinkedRelatedField(
+    """author = serializers.HyperlinkedRelatedField(
         many=False,
         read_only=True,
         view_name='user-detail'
     )
-    """articles =  serializers.HyperlinkedRelatedField(
+    articles =  serializers.HyperlinkedRelatedField(
         many=True,
         read_only=True,
         view_name='article-detail'
