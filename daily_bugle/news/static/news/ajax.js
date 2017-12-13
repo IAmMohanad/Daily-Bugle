@@ -170,6 +170,8 @@ function deleteComment(data, textStatus, jqHXR){
 		$('#'+data['id']).remove();
 	}
 function GetAllLikes(data, textStatus, jqHXR){
-	$(".Like").find('#likes').text("Total Likes:"+ data['totalLikes']);
-	$(".Like").find('#dislikes').text("Total DisLikes:"+ data['totalDisLikes']);
+	$("#good").html('<span class="glyphicon glyphicon-thumbs-up"></span> '+data['totalLikes']);
+	$("#bad").html('<span class="glyphicon glyphicon-thumbs-down"></span> '+data['totalDisLikes']);
+	//$(".Like").find('#likes').text("Total Likes:"+ data['totalLikes']);
+	//$(".Like").find('#dislikes').text("Total DisLikes:"+ data['totalDisLikes']);
 }
