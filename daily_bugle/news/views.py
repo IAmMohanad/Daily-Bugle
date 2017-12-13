@@ -197,7 +197,8 @@ def article(request, article_id):
             "text": found_article.text,
             "pub_date": found_article.pub_date,
             "author_name": found_article.author.first_name,
-            "category_name": found_article.category.name
+            "category_name": found_article.category.name,
+            "user": request.user
         }
 
         return render(request, 'news/article.html', context)
@@ -292,7 +293,7 @@ def comment(request, article_id):
             context[comment.pk] = {
                 "pk": comment.pk,
                 "text": comment.text,
-                "pub_date": comment.pub_date,
+                "pub_date": comment.pub_date.strftime('%d, %b %Y'),
                 "author": findUser(comment.author_id)["First_name"],
                 "email":findUser(comment.author_id)["email"]
             }
@@ -305,7 +306,18 @@ def comment(request, article_id):
         #text = request.POST.get("name")
         NewComment = Comment(text=text,article_id=article_id,author_id=current_user.id)
         NewComment.save()
-        idOfComment = NewComment.id
+        comments = get_list_or_404(Comment, article_id=article_id)
+        context = dict()
+        for comment in comments:
+            context[comment.pk] = {
+                "pk": comment.pk,
+                "text": comment.text,
+                "pub_date": comment.pub_date.strftime('%d, %b %Y'),
+                "author": findUser(comment.author_id)["First_name"],
+                "email":findUser(comment.author_id)["email"]
+            }
+        return JsonResponse(context)
+        '''idOfComment = NewComment.id
         commentsObj = get_object_or_404(Comment, id=idOfComment)
         context = dict()
         print ("object primary key is ")
@@ -322,7 +334,7 @@ def comment(request, article_id):
         #    'text':text,
         #    'id':idOfComment
         #}
-        return JsonResponse(data)
+        return JsonResponse(data)'''
 
 @csrf_exempt
 def del_comment(request, article_id,comment_id):

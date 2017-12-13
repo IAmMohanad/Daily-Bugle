@@ -113,7 +113,25 @@ function printError( req, status, err ) {
    console.log('An issue has occured See error --->', status, err)
   }
 function AddComment(data, textStatus, jqHXR){
-   /* 
+	$("#commentsContainer").empty();
+	$.each(data, function(i, comment) {
+		var div = $("<div id="+ comment.pk +">")
+		$("#commentsContainer").append(div);
+		$("#"+comment.pk).append('<ul class="list-group">');
+			var Comment = $("<textarea id='Comment' disabled='true' class='form-control'></textarea>").text(comment.text);
+        $("#"+comment.pk).append(Comment);
+			var AuthorName = $("<li class='list-group-item' id= 'AuthorName' ></li>").text("Author: " + comment.author);
+				$("#"+comment.pk).append(AuthorName);
+			var AuthorEmail = $("<li class='list-group-item' id= 'AuthorEmail' ></li>").text("email : " + comment.email);
+				$("#"+comment.pk).append(AuthorEmail);
+			var pub_date = $("<li class='list-group-item' id='pub_date' ></li>").text("Publication_date : " + comment.pub_date);
+				$("#"+comment.pk).append(pub_date);
+	    var DeleteButton= '<button type="submit" class="btn btn-warning deleteComment" name="DeleteButton">Delete</button>';
+	      $("#"+comment.pk).append(DeleteButton);
+		$("#"+comment.pk).append('</ul>');
+		})
+  }
+   /*
       NewCommentAdded= data['text'];
       pk=data['id'];
       var div = $("<div id="+pk +">")
@@ -124,24 +142,28 @@ function AddComment(data, textStatus, jqHXR){
       $("#"+pk).append(DeleteButton);
     }
   */
-	console.log(data)
-	var div = $("<div id="+ data['pk'] +"></div>")
-
+	/*
+	var div = $("<div id="+data['pk']+">")
 		$("#"+data['pk']).append('<ul class="list-group">');
-		$("#body").append(div);
-		var comment = $("<textarea class='list-group-item' disabled='true' id= 'Comment' ></textarea>").text(data['text']);
+		("#commentsContainer").append(div);
+		//var comment = $('<textarea class="list-group-item" disabled="true" id= "Comment"></textarea>")'.text(data['text']);
+		var Comment = $("<textarea id='Comment' disabled='true' class='form-control'></textarea>").text(data['text']);
 	    $("#"+data['pk']).append(comment);
+		//var AuthorName = $("<li class='list-group-item' id= 'AuthorName' ></li>").text("Author: " + data['author']);
 		var AuthorName = $("<li class='list-group-item' id= 'AuthorName' ></li>").text("Author: " + data['author']);
-		$("#"+data['pk']).append(AuthorName);
+			$("#"+data['pk']).append(AuthorName);
+		//var AuthorEmail = $("<li class='list-group-item' id= 'AuthorEmail' ></li>").text("email : " + data['email']);
 		var AuthorEmail = $("<li class='list-group-item' id= 'AuthorEmail' ></li>").text("email : " + data['email']);
-		$("#"+data['pk']).append(AuthorEmail);
-		var pub_date = $("<li class='list-group-item' id= 'pub_date' ></li>").text("Publication_date : " + data['pub_date']);
-		$("#"+data['pk']).append(pub_date);
-	    var DeleteButton= "<button type='submit' class='btn btn-default' value='Delete' name='DeleteButton>'";
+			$("#"+data['pk']).append(AuthorEmail);
+		//var pub_date = $("<li class='list-group-item' id= 'pub_date' ></li>").text("Publication_date : " + data['pub_date']);
+		var pub_date = $("<li class='list-group-item' id='pub_date' ></li>").text("Publication_date : " + data['pub_date']);
+			$("#"+data['pk']).append(pub_date);
+	  //var DeleteButton= "<button type='submit' class='btn btn-default' value='Delete' name='DeleteButton>'";
+		var DeleteButton= '<button type="submit" class="btn btn-warning deleteComment" name="DeleteButton">Delete</button>';
 	    $("#"+data['pk']).append(DeleteButton);
-		$("#"+data['pk']).append('</ul>');
+	$("#"+data['pk']).append('</ul>');
 
-}
+}*/
 
 function deleteComment(data, textStatus, jqHXR){
 		var myNode = document.getElementById(data['id']);

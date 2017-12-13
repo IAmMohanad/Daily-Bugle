@@ -3,43 +3,44 @@
 {% block title %}Index{% endblock %}
 
 {% block content %}
-
-<h3> Pies </h3>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tristique dapibus ante fringilla malesuada. Morbi eget leo vel dolor pharetra feugiat.
-  In interdum sed sem ut consequat. Nam tincidunt mattis ex, a congue erat dapibus vel. Pellentesque laoreet pellentesque quam, ac volutpat ante vehicula quis.
-  Etiam quis ligula sed sapien lobortis semper sit amet at felis. In hac habitasse platea dictumst. Pellentesque lobortis lectus arcu, a ullamcorper risus suscipit ut.
-  Nulla eleifend vehicula eros eget dictum. Vestibulum sed congue urna, nec dictum massa. Fusce fringilla libero ut justo rutrum posuere. Integer dignissim,
-  tortor sit amet gravida lacinia, tellus est rhoncus magna, sit amet laoreet lorem magna vitae nunc. Curabitur ligula urna, pharetra vel nulla a, pharetra ullamcorper erat.
-  <span style="color: blue;"> View more... </span>
-  <hr class="divider">
-</p>
-
-{% if articlesList %}
-  {% for article in articlesList %}
-    <h3> {{article.title}} </h3>
-    <p> {{article.text}} <a class="article_link" href= "/article/{{ article.id }}"> View more... </a></p>
-    <hr class="divider">
-  {% endfor %}
-{% endif %}
 <div class="row">
-  <div class="col-md-10 col-md-offset-1">
-    <button class="btn btn-default">Load more articles</button> 
+  <div class="col-md-12">
+    <h2> Pies </h2>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tristique dapibus ante fringilla malesuada. Morbi eget leo vel dolor pharetra feugiat.
+      In interdum sed sem ut consequat. Nam tincidunt mattis ex, a congue erat dapibus vel. Pellentesque laoreet pellentesque quam, ac volutpat ante vehicula quis.
+      Etiam quis ligula sed sapien lobortis semper sit amet at felis. In hac habitasse platea dictumst. Pellentesque lobortis lectus arcu, a ullamcorper risus suscipit ut.
+      Nulla eleifend vehicula eros eget dictum. Vestibulum sed congue urna, nec dictum massa. Fusce fringilla libero ut justo rutrum posuere. Integer dignissim,
+      tortor sit amet gravida lacinia, tellus est rhoncus magna, sit amet laoreet lorem magna vitae nunc. Curabitur ligula urna, pharetra vel nulla a, pharetra ullamcorper erat.
+      <span style="color: blue;"> View more... </span>
+      <hr class="divider">
+    </p>
+
+    {% if articlesList %}
+      {% for article in articlesList %}
+        <div class="row">
+          <div class="col-md-12">
+            <h2> {{article.title}} </h2>
+            <p> {{article.text}} <a class="article_link" href= "/article/{{ article.id }}"> View more... </a></p>
+            <hr class="divider">
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <button class="btn btn-default" id="loadMore">Load more articles</button>
   </div>
 </div>
 
 
-{% if articlesList %}
-  {{articlesList}}
-{% endif %}
 
 
-<hr>
-<hr>
-<hr>
-<hr>
-<hr>
-<hr>
-<hr>
+
+
+
 
 <h2>Index</h2>
 
