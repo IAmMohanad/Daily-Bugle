@@ -170,11 +170,31 @@ def getArticles():
             "id": article.pk,
             "title": article.title,
             "text": article.text,
-            "pub_date": article.pub_date
-            #"author_name": article.author.first_name,
-            #"category_name": article.category.name
+            "pub_date": article.pub_date,
+            "author_name": article.author.first_name,
+            "category_name": article.category.name
         })
     return articlesList
+
+def loadMoreArticles(request, articlesAmount):
+    if 5 is not 0 and 5 is not None:
+        articles = Article.objects.order_by("-pk")[5 : 5 + 5]
+    else:
+        articles = Article.objects.order_by("-pk")[:5]
+
+    articlesList = []
+
+    for article in articles:
+        articlesList.append({
+            "id": article.pk,
+            "title": article.title,
+            "text": article.text,
+            "pub_date": article.pub_date,
+            "author_name": article.author.first_name,
+            "category_name": article.category.name
+        })
+
+    return JsonResponse({"articlesList": articlesList})
 
 # views.request
 # Returns back one article object
@@ -304,6 +324,7 @@ def comment(request, article_id):
         RequestData = QueryDict(request.body)#Querydict is used to retrived the new price of the ITEM
         text= RequestData.get('text')
         #text = request.POST.get("name")
+        print("-------------------------------------------------"+text)
         NewComment = Comment(text=text,article_id=article_id,author_id=current_user.id)
         NewComment.save()
         comments = get_list_or_404(Comment, article_id=article_id)

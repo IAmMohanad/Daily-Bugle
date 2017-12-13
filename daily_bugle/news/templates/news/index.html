@@ -3,9 +3,8 @@
 {% block title %}Index{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-md-12">
-    <h2> Pies </h2>
+<div class="row" id="articles">
+    <!--<h2> Pies </h2>
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tristique dapibus ante fringilla malesuada. Morbi eget leo vel dolor pharetra feugiat.
       In interdum sed sem ut consequat. Nam tincidunt mattis ex, a congue erat dapibus vel. Pellentesque laoreet pellentesque quam, ac volutpat ante vehicula quis.
       Etiam quis ligula sed sapien lobortis semper sit amet at felis. In hac habitasse platea dictumst. Pellentesque lobortis lectus arcu, a ullamcorper risus suscipit ut.
@@ -13,31 +12,62 @@
       tortor sit amet gravida lacinia, tellus est rhoncus magna, sit amet laoreet lorem magna vitae nunc. Curabitur ligula urna, pharetra vel nulla a, pharetra ullamcorper erat.
       <span style="color: blue;"> View more... </span>
       <hr class="divider">
-    </p>
-
+    </p>-->
     {% if articlesList %}
       {% for article in articlesList %}
-        <div class="row">
+        <div class="row article">
           <div class="col-md-12">
             <h2> {{article.title}} </h2>
-            <p> {{article.text}} <a class="article_link" href= "/article/{{ article.id }}"> View more... </a></p>
+            <p> {{article.text}} <a class="article_link" href= "/article/{{ article.id }}"> <br>View more... </a></p>
             <hr class="divider">
           </div>
         </div>
       {% endfor %}
     {% endif %}
-  </div>
 </div>
-
-<div class="row">
   <div class="col-md-12">
-    <button class="btn btn-default" id="loadMore">Load more articles</button>
+    <button class="btn btn-default" id="loadMore" >Load more articles</button>
   </div>
 </div>
+<script>
 
+$( document ).ready(function() {
 
+  function addArticlesToPage(data, textStatus, jqHXR){
+  	//$("#articles").empty();
+    console.log(data);
+  	$.each(data, function(i, list) {
+      $.each(list, function(i, article) {
+  		$("#articles").append('<div class="row article">')
+  		  $("#articles").append('<div class="col-md-12">')
+  		    $("#articles").append('<h2> '+article.title+ '</h2>')
+  		    $("#articles").append('<p> '+article.text+ '<a class="article_link" href= "/article/'+article.id+ '"> View more... </a></p>')
+  		    $("#articles").append('<hr class="divider">')
+  		  $("#articles").append('</div>')
+  		$("#articles").append('</div>')
+  	 });
+    });
+  }
 
+$(document).on("click","#loadMore", function (){
+    var currentArticleAmount = $('.article').length
+    console.log(currentArticleAmount)
+    $.ajax({
+        url : "loadMore/"+currentArticleAmount,
+        type : "GET",
+        data : {
+          'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
+          },
+        success : addArticlesToPage,
+        error : printError
+    });
+  });
+});
 
+function printError( req, status, err ) {
+   console.log('An issue has occured See error --->', status, err)
+  }
+</script>
 
 
 

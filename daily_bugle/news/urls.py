@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^login$', views.login, name='login'),
     url(r'^logout$', views.logout, name='logout'),
     url(r'^user/update$', views.updateProfile, name='userUpdate'),
+    url(r'^loadMore/(?P<articlesAmount>([0-9]+))$', views.loadMoreArticles, name='loadMoreArticles'),
     # Login Page - Logout
     # url(r'^/logout', auth_views.logout, name='logout'),
     # User Page
