@@ -73,20 +73,22 @@ function loadAllComments(data, textStatus, jqHXR){
 	console.log("lfldkjldkf")
 	$.each(data, function(i, comment) {
 		var div = $("<div id="+ comment.pk +">")
-		$("body").append(div);
-		var Comment = $("<li id= 'Comment' ></li>").text("Comment: " + comment.text);
+		$("#commentsContainer").append(div);
+		$("#"+comment.pk).append('<ul class="list-group">');
+			var Comment = $("<textarea id='Comment' disabled='true' class='form-control'></textarea>").text(comment.text);
         $("#"+comment.pk).append(Comment);
-		var AuthorName = $("<li id= 'AuthorName' ></li>").text("Author: " + comment.author);
-		$("#"+comment.pk).append(AuthorName);
-		var AuthorEmail = $("<li id= 'AuthorEmail' ></li>").text("email : " + comment.email);
-		$("#"+comment.pk).append(AuthorEmail);
-		var pub_date = $("<li id= 'pub_date' ></li>").text("Publication_date : " + comment.pub_date);
-		$("#"+comment.pk).append(pub_date);
-        var DeleteButton= "<input type= submit value= Delete name=DeleteButton>";
-        $("#"+comment.pk).append(DeleteButton);
-	})
-
+			var AuthorName = $("<li class='list-group-item' id= 'AuthorName' ></li>").text("Author: " + comment.author);
+				$("#"+comment.pk).append(AuthorName);
+			var AuthorEmail = $("<li class='list-group-item' id= 'AuthorEmail' ></li>").text("email : " + comment.email);
+				$("#"+comment.pk).append(AuthorEmail);
+			var pub_date = $("<li class='list-group-item' id='pub_date' ></li>").text("Publication_date : " + comment.pub_date);
+				$("#"+comment.pk).append(pub_date);
+	    var DeleteButton= '<button type="submit" class="btn btn-warning deleteComment" name="DeleteButton">Delete</button>';
+	      $("#"+comment.pk).append(DeleteButton);
+		$("#"+comment.pk).append('</ul>');
+		})
   }
+
 function SendComment(Article_ID_Value) {
 	  var $FormData = $('#send :input');
 	  var ListOfFormData = {};
@@ -111,6 +113,17 @@ function printError( req, status, err ) {
    console.log('An issue has occured See error --->', status, err)
   }
 function AddComment(data, textStatus, jqHXR){
+   /* 
+      NewCommentAdded= data['text'];
+      pk=data['id'];
+      var div = $("<div id="+pk +">")
+      $("body").append(div);
+      var text = $("<li id= 'name' ></li>").text("name: "+ NewCommentAdded.toString());
+      $("#"+pk).append(text);
+      var DeleteButton=    "<input type= submit value= Delete name=DeleteButton>";
+      $("#"+pk).append(DeleteButton);
+    }
+  */
 	console.log(data)
 	var div = $("<div id="+ data['pk'] +"></div>")
 

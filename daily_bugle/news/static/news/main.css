@@ -12,8 +12,8 @@ body {
 }
 
 #main_container{
-  /*height: calc(100% - 40px);*/
-  min-height: calc(100% - 40px);
+  height: calc(100% - 40px);
+  min-height: calc(100% - 30px);
 }
 
 hr.divider{
@@ -34,6 +34,7 @@ hr.divider{
 a.article_link:link {
     color: red;
 }
+
 
 .footer {
   position: absolute;

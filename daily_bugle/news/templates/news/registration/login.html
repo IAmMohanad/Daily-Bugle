@@ -7,7 +7,7 @@
 {{ no_user }}
 {% endif %}
 <h2>Login</h2>
-<form action="/login" method="post" style="border:0.5px solid #00BFFF;padding:10px;">
+<form action="/login" method="post" id="login_form" style="border:0.5px solid #00BFFF;padding:10px;">
   <div class="form-group">
     <label for="email">Email</label>
     <input type="email" class="form-control" id="email" name="email" placeholder="Email">
@@ -16,7 +16,7 @@
     <label for="password">Password</label>
     <input type="password" class="form-control" id="password" name="password" placeholder="Password">
   </div>
-  <button type="submit">Login</button>
+  <button class="btn btn-info" type="submit">Login</button>
 
 </form>
 {% endblock %}
