@@ -47,9 +47,6 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
     permission_classes = (IsAuthenticated,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -94,7 +91,8 @@ def signup(request):
             user = authenticate(email = form.cleaned_data['email'], password = form.cleaned_data['password1'])
             loginUser(request, user)
             current_user = user
-            return render(request, 'news/index.html', {'user':user.id})
+            #return render(request, 'news/index.html', {'user':user.id})
+            return redirect('/')
         else:#not valid, return with errors
             return render(request, 'news/registration/signup.html', {'form':form})
 
@@ -177,10 +175,10 @@ def getArticles():
     return articlesList
 
 def loadMoreArticles(request, articlesAmount):
-    if 5 is not 0 and 5 is not None:
-        articles = Article.objects.order_by("-pk")[5 : 5 + 5]
-    else:
-        articles = Article.objects.order_by("-pk")[:5]
+    total_articles = Article.objects.all().count()
+    if int(articlesAmount)  != 0 and articlesAmount is not None:
+        if int(articlesAmount)  <= total_articles:
+            articles = Article.objects.order_by("-pk")[int(articlesAmount) : int(articlesAmount)  + 5]
 
     articlesList = []
 
