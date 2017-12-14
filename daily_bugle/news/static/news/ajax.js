@@ -103,6 +103,10 @@ function SendComment(Article_ID_Value) {
 
 	  $FormData.each(function() {
 	      ListOfFormData[this.name] = $(this).val();
+          if(this.name=='name')
+          {
+              $('#Name').val("")
+          }
 	  });
       NewComment=ListOfFormData['name']
       ListOfFormData['name']
