@@ -54,6 +54,7 @@ $('#bad').click(function(){
   	      ValuesOfComment[this.name] = $(this).val();
   	    });
         if (ValuesOfComment['name'] ==""){
+            event.preventDefault();
             alert("No comment was added")
         }
         else{
