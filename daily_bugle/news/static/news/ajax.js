@@ -126,6 +126,9 @@ function printError( req, status, err ) {
   }
 function AddComment(data, textStatus, jqHXR){
 	$("#commentsContainer").empty();
+    loadAllComments(data, textStatus, jqHXR)
+}
+    /*
 	$.each(data, function(i, comment) {
 		var div = $("<div id="+ comment.pk +">")
 		$("#commentsContainer").append(div);
@@ -142,7 +145,7 @@ function AddComment(data, textStatus, jqHXR){
 	      $("#"+comment.pk).append(DeleteButton);
 		$("#"+comment.pk).append('</ul>');
 		})
-  }
+  }*/
    /*
       NewCommentAdded= data['text'];
       pk=data['id'];
