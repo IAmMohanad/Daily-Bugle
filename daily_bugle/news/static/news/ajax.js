@@ -48,9 +48,18 @@ $('#bad').click(function(){
 
 	});
 	$('#send').on('submit', function(event){
-		event.preventDefault();
-		SendComment(Article_ID_Value);
-
+        var $FormData = $('#send :input');
+        var ValuesOfComment = {};
+        $FormData.each(function() {
+  	      ValuesOfComment[this.name] = $(this).val();
+  	    });
+        if (ValuesOfComment['name'] ==""){
+            alert("No comment was added")
+        }
+        else{
+    		event.preventDefault();
+    		SendComment(Article_ID_Value);
+        }
 	});
 	$(document).on('click',"[name='DeleteButton']",function(){//I am using the JQuery 'on' as the button 'DeleteButton' is added dynmaically inside the fucntion 'LoadPageProducts'
 		var pkval=$(this).parent().attr("id");
@@ -70,7 +79,6 @@ $('#bad').click(function(){
 });
 
 function loadAllComments(data, textStatus, jqHXR){
-	console.log("lfldkjldkf")
 	$.each(data, function(i, comment) {
 		var div = $("<div id="+ comment.pk +">")
 		$("#commentsContainer").append(div);
@@ -95,15 +103,15 @@ function SendComment(Article_ID_Value) {
 
 	  $FormData.each(function() {
 	      ListOfFormData[this.name] = $(this).val();
-		  console.log("List of type: "+this.name +" inside values " +ListOfFormData[this.name]);
 	  });
-	  console.log("we are here")
+      NewComment=ListOfFormData['name']
+      ListOfFormData['name']
 	    $.ajax({
 	        url : "/article/"+Article_ID_Value+"/comments",
 	        type : "POST",
 	        data : {
-						'text':ListOfFormData['name'],
-						'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
+						'text':NewComment,
+						'csrfmiddlewaretoken':$("input[name=csrfmiddlewaretoken]").val()
 					},
 	        success : AddComment,
 	        error : printError

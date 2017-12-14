@@ -24,44 +24,17 @@ from .serializers import ArticleSerializer,UserSerializer,CommentSerializer,Cate
 #
 # User Views
 #
-
-
-
 class ArticleViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    #permission_classes = (IsAuthenticated,)
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
-    '''def get_queryset(self):
-        return Article.objects.filter(id=self.request.user.id)
-'''
-    '''def perform_create(self, serializer):
-        permission_classes = (IsAuthenticated,)
-
-        print("jfedjflkjflkdjsflkdsaf")
-        serializer.save(id=self.request.user.id)
-        serializer.data.Author = self.request.user.id
-        super(ArticleViewSet, self).perform_create(serializer)'''
-
 
 class UserViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
 class CommentViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    permission_classes = (IsAuthenticated,)
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 class CategoryViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    permission_classes = (IsAuthenticated,)
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
@@ -322,7 +295,6 @@ def comment(request, article_id):
         RequestData = QueryDict(request.body)#Querydict is used to retrived the new price of the ITEM
         text= RequestData.get('text')
         #text = request.POST.get("name")
-        print("-------------------------------------------------"+text)
         NewComment = Comment(text=text,article_id=article_id,author_id=current_user.id)
         NewComment.save()
         comments = get_list_or_404(Comment, article_id=article_id)

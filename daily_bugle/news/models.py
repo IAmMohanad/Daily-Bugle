@@ -54,7 +54,7 @@ class User(AbstractUser):
 class Category(models.Model):
     name = models.CharField(max_length=255)
     def __str__(self):
-        return str(self.pk)
+        return self.name
 
 class Article(models.Model):
     title = models.CharField(max_length=255)
@@ -64,7 +64,7 @@ class Article(models.Model):
     category = models.ForeignKey(Category, related_name='articles', on_delete=models.CASCADE) # Category ID - One -> One / One Articles -> One Category
 
     def __str__(self):
-        return str(self.pk)
+        return self.title
 
 class Comment(models.Model):
     text = models.TextField()
@@ -73,7 +73,7 @@ class Comment(models.Model):
     article = models.ForeignKey(Article,related_name='comments',on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.pk)
+        return self.text
 
 class Like(models.Model):
     isLike = models.NullBooleanField()
