@@ -140,9 +140,9 @@ def updateProfile(request):
         # save if valid
         if form.is_valid():
             form.save()
-            return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'success', 'user': request.user})
+            return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'Succesfully updated your profile.', 'user': request.user})
         else:
-            return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'failed'})
+            return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'Failed to update your profile. Check your details.'})
 
 """
 Returns 5 articles.
