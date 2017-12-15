@@ -25,7 +25,7 @@ SECRET_KEY = '6w+5ovg(2#h050-$n+xydeh318%(e*zniq@asnbnj2dx#0gk=&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['dailybugle-nabil.apps.devcloud.eecs.qmul.ac.uk']
 
 
 # Application definition
@@ -80,10 +80,27 @@ WSGI_APPLICATION = 'daily_bugle.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
+db_name = os.environ.get('OPENSHIFT_APP_NAME')
+db_user = os.environ.get('OPENSHIFT_MYSQL_DB_USERNAME')
+db_pass = os.environ.get('OPENSHIFT_MYSQL_DB_PASSWORD')
+db_host = os.environ.get('OPENSHIFT_MYSQL_DB_HOST')
+db_port = os.environ.get('OPENSHIFT_MYSQL_DB_PORT')
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': db_name,
+        'USER': db_user,
+        'PASSWORD': db_pass,
+        'HOST': db_host,
+        'PORT': db_port,
     }
 }
 
@@ -125,5 +142,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(os.environ['OPENSHIFT_REPO_DIR'], 'wsgi', 'static')
 
 AUTH_USER_MODEL = 'news.User'
