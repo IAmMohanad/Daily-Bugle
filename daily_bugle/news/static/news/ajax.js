@@ -1,87 +1,88 @@
+//Page refresh will trigger an Jquery listeners on teh article.html or index.html page.
 $( document ).ready(function() {
-    var Article_ID_Value = ''+article_idd;
+    //A page refresh will trigger this ajax request and load all the comments on the page.
 	$.ajax({
 	  type: 'GET',
-	  url: '/article/'+Article_ID_Value+'/comments',
+	  url: '/article/'+article_id_value+'/comments',//URL used to send the http request to the view fucntion 'comment'
 	  data : {
 	    'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 	  },
-	  success: loadAllComments,
+	  success: loadAllComments,//Fucntion to load all the comments on the page
 	  dataType: 'json',
 	  error:  printError
 	});
+    //A page refresh will trigger this ajax request and load all the Likes and dislikes on the page.
 	$.ajax({
 		type: 'GET',
-		url: '/article/'+Article_ID_Value+'/likes',
+		url: '/article/'+article_id_value+'/likes',//A http request is sent to the 'AllLikes' view function
 		data : {
 			'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 		},
-		success: GetAllLikes,
+		success: getAllLikesAndDislikes,//This will populate the article.html page with all the likes and dislikes
 		dataType: 'json',
 		error:  printError
 	});
 
-	$('#good').click(function(){
+	$('#good').click(function(){//When the like button is selected, and ajax call will be sent to update the database.
 
 		$.ajax({
-				url : "/article/"+Article_ID_Value+"/addorDislike/1",
+				url : "/article/"+article_id_value+"/addorDislike/1",
 				type : "POST",
 				data : {
 					'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 					},
-				success : GetAllLikes,
+				success : getAllLikesAndDislikes,
 				error : printError
+	           });
 	});
-
-	});
-$('#bad').click(function(){
+$('#bad').click(function(){//When the dislike button is selected, and ajax call will be sent to update the database.
 
 		$.ajax({
-				url : "/article/"+Article_ID_Value+"/addorDislike/0",
+				url : "/article/"+article_id_value+"/addorDislike/0",
 				type : "POST",
 				data : {
 					'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 					},
-				success : GetAllLikes,
+				success : getAllLikesAndDislikes,
 				error : printError
-	});
+	           });
 
 	});
-	$('#send').on('submit', function(event){
+	$('#send').on('submit', function(event){//When the user selects clicks on the 'add comment' button on the article page it will update the databse with the new comments.
         var $FormData = $('#send :input');
         var ValuesOfComment = {};
         $FormData.each(function() {
-  	      ValuesOfComment[this.name] = $(this).val();
+  	      ValuesOfComment[this.name] = $.trim($(this).val());
   	    });
-        if (ValuesOfComment['name'] ==""){
+
+        if (ValuesOfComment['name'] ==""){//This will promt the user if an empty comment was added.
             event.preventDefault();
             alert("No comment was added")
         }
         else{
-    		event.preventDefault();
-    		SendComment(Article_ID_Value);
+    		event.preventDefault();//This disables the browser post request for a form.
+    		SendComment(article_id_value);//This function will call an ajax request and update the comments on the databse.
         }
 	});
 	$(document).on('click',"[name='DeleteButton']",function(){//I am using the JQuery 'on' as the button 'DeleteButton' is added dynmaically inside the fucntion 'LoadPageProducts'
-		var pkval=$(this).parent().attr("id");
-		console.log("this is the id of the comment " +pkval)
+		var pkval=$(this).parent().attr("id");//Every comment is added in a div where the id of that div is the id of the comment.
 		$.ajax({
-			type: 'DELETE',
-			url: '/article/'+Article_ID_Value+'/comments/'+pkval,
+			type: 'DELETE',//Sending a Delete request.
+			url: '/article/'+article_id_value+'/comments/'+pkval,//Passing the id of the comment as part of the url will help identify which comment to delete.
 			data : {
 				'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
 			},
-			success: deleteComment,
+			success: deleteComment,//This function will update the the html page by deleting the comments dynmaically
 			dataType: 'json',
 			error:  printError
 		});
 	});
 
 });
-
+//Loading all the comments dynmaically on the article.html page.
 function loadAllComments(data, textStatus, jqHXR){
 	$.each(data, function(i, comment) {
-		var div = $("<div id="+ comment.pk +">")
+		var div = $("<div id="+ comment.pk +">")//The id of the comment will be used as the div id attrubute.
 		$("#commentsContainer").append(div);
 		$("#"+comment.pk).append('<ul class="list-group">');
 			var Comment = $("<textarea id='Comment' disabled='true' class='form-control'></textarea>").text(comment.text);
@@ -97,97 +98,47 @@ function loadAllComments(data, textStatus, jqHXR){
 		$("#"+comment.pk).append('</ul>');
 		})
   }
-
-function SendComment(Article_ID_Value) {
-	  var $FormData = $('#send :input');
+//This function will be called from a succesful ajax request, it will send the comment to the view function that will update the comment on the database
+function SendComment(article_id_value) {
+	  var $FormData = $('#send :input');//using Jquery to retieve all the form data values
 	  var ListOfFormData = {};
-
 	  $FormData.each(function() {
 	      ListOfFormData[this.name] = $(this).val();
-          if(this.name=='name')
+          if(this.name=='name')//This is the name value of the input field of the comment.
           {
-              $('#Name').val("")
+              $('#Name').val("")//This will remove the comment after the clicking on 'addComment'
           }
 	  });
-      NewComment=ListOfFormData['name']
-      ListOfFormData['name']
+      NewComment=ListOfFormData['name']//NewComment will have the new comment
 	    $.ajax({
-	        url : "/article/"+Article_ID_Value+"/comments",
+	        url : "/article/"+article_id_value+"/comments",
 	        type : "POST",
 	        data : {
-						'text':NewComment,
+						'text':NewComment,//Passing the new comment as part of the POST request
 						'csrfmiddlewaretoken':$("input[name=csrfmiddlewaretoken]").val()
 					},
-	        success : AddComment,
+	        success : AddComment,//This function will update the html page dynmaically
 	        error : printError
 	  });
 	};
-function printError( req, status, err ) {
+function printError( req, status, err ) {//Error is printed showing any details about the cause of the issue.
    console.log('An issue has occured See error --->', status, err)
   }
-function AddComment(data, textStatus, jqHXR){
+function AddComment(data, textStatus, jqHXR){//Adding a comment will empty the 'commentscontainer' on the article.html and will then call the fucntion loadAllComments to load all the comments.
 	$("#commentsContainer").empty();
     loadAllComments(data, textStatus, jqHXR)
 }
-    /*
-	$.each(data, function(i, comment) {
-		var div = $("<div id="+ comment.pk +">")
-		$("#commentsContainer").append(div);
-		$("#"+comment.pk).append('<ul class="list-group">');
-			var Comment = $("<textarea id='Comment' disabled='true' class='form-control'></textarea>").text(comment.text);
-        $("#"+comment.pk).append(Comment);
-			var AuthorName = $("<li class='list-group-item' id= 'AuthorName' ></li>").text("Author: " + comment.author);
-				$("#"+comment.pk).append(AuthorName);
-			var AuthorEmail = $("<li class='list-group-item' id= 'AuthorEmail' ></li>").text("email : " + comment.email);
-				$("#"+comment.pk).append(AuthorEmail);
-			var pub_date = $("<li class='list-group-item' id='pub_date' ></li>").text("Publication_date : " + comment.pub_date);
-				$("#"+comment.pk).append(pub_date);
-	    var DeleteButton= '<button type="submit" class="btn btn-warning deleteComment" name="DeleteButton">Delete</button>';
-	      $("#"+comment.pk).append(DeleteButton);
-		$("#"+comment.pk).append('</ul>');
-		})
-  }*/
-   /*
-      NewCommentAdded= data['text'];
-      pk=data['id'];
-      var div = $("<div id="+pk +">")
-      $("body").append(div);
-      var text = $("<li id= 'name' ></li>").text("name: "+ NewCommentAdded.toString());
-      $("#"+pk).append(text);
-      var DeleteButton=    "<input type= submit value= Delete name=DeleteButton>";
-      $("#"+pk).append(DeleteButton);
-    }
-  */
-	/*
-	var div = $("<div id="+data['pk']+">")
-		$("#"+data['pk']).append('<ul class="list-group">');
-		("#commentsContainer").append(div);
-		//var comment = $('<textarea class="list-group-item" disabled="true" id= "Comment"></textarea>")'.text(data['text']);
-		var Comment = $("<textarea id='Comment' disabled='true' class='form-control'></textarea>").text(data['text']);
-	    $("#"+data['pk']).append(comment);
-		//var AuthorName = $("<li class='list-group-item' id= 'AuthorName' ></li>").text("Author: " + data['author']);
-		var AuthorName = $("<li class='list-group-item' id= 'AuthorName' ></li>").text("Author: " + data['author']);
-			$("#"+data['pk']).append(AuthorName);
-		//var AuthorEmail = $("<li class='list-group-item' id= 'AuthorEmail' ></li>").text("email : " + data['email']);
-		var AuthorEmail = $("<li class='list-group-item' id= 'AuthorEmail' ></li>").text("email : " + data['email']);
-			$("#"+data['pk']).append(AuthorEmail);
-		//var pub_date = $("<li class='list-group-item' id= 'pub_date' ></li>").text("Publication_date : " + data['pub_date']);
-		var pub_date = $("<li class='list-group-item' id='pub_date' ></li>").text("Publication_date : " + data['pub_date']);
-			$("#"+data['pk']).append(pub_date);
-	  //var DeleteButton= "<button type='submit' class='btn btn-default' value='Delete' name='DeleteButton>'";
-		var DeleteButton= '<button type="submit" class="btn btn-warning deleteComment" name="DeleteButton">Delete</button>';
-	    $("#"+data['pk']).append(DeleteButton);
-	$("#"+data['pk']).append('</ul>');
-
-}*/
-
-function deleteComment(data, textStatus, jqHXR){
-		var myNode = document.getElementById(data['id']);
+function deleteComment(data, textStatus, jqHXR){//This function will dynmaically delete the comment on the article page.
 		$('#'+data['id']).remove();
 	}
-function GetAllLikes(data, textStatus, jqHXR){
-	$("#good").html('<span class="glyphicon glyphicon-thumbs-up"></span> '+data['totalLikes']);
-	$("#bad").html('<span class="glyphicon glyphicon-thumbs-down"></span> '+data['totalDisLikes']);
-	//$(".Like").find('#likes').text("Total Likes:"+ data['totalLikes']);
-	//$(".Like").find('#dislikes').text("Total DisLikes:"+ data['totalDisLikes']);
+	//Fucntion is called when the user; clicks the like/dislike button also when a page refresh occurs.
+function getAllLikesAndDislikes(data, textStatus, jqHXR){//This fucntion will populate the likes count and dislikes count on the article.html page.
+	if (data['updated']){
+		$("#good").html('<span class="glyphicon glyphicon-thumbs-up"></span> '+data['totalLikes']);
+		$("#bad").html('<span class="glyphicon glyphicon-thumbs-down"></span> '+data['totalDisLikes']);
+	}
+	else if(!data['updated']){
+		$("#good").html('<span class="glyphicon glyphicon-thumbs-up"></span> '+data['totalLikes']);
+		$("#bad").html('<span class="glyphicon glyphicon-thumbs-down"></span> '+data['totalDisLikes']);
+	}
 }

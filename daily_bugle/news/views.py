@@ -24,6 +24,11 @@ from .serializers import ArticleSerializer,UserSerializer,CommentSerializer,Cate
 #
 # User Views
 #
+"""
+The following four methods use django's ViewSet, this will allow for all the CRUD opertation on the API.
+The queryset is used to provid the records for each table in the database.
+The serializer_class is used to identify which serializers is being in the serializers.py classs 
+"""
 class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
@@ -274,11 +279,14 @@ def findUser(author_id):
     }
     return userInfo
 
-@login_required
+"""
+This function will check if the request is  GET method in which case it will provide all the comments for a specific article_id
+If the request method is post then it will post a new comment for the logged in user.
+"""
 @csrf_exempt
 def comment(request, article_id):
     if request.method == 'GET':
-        comments = get_list_or_404(Comment, article_id=article_id)
+        comments = get_list_or_404(Comment, article_id=article_id)#Using get_list_or_404 becuase the the the commnent may not exist and it was throw a 404 error
         context = dict()
         for comment in comments:
             context[comment.pk] = {
@@ -308,25 +316,10 @@ def comment(request, article_id):
                 "email":findUser(comment.author_id)["email"]
             }
         return JsonResponse(context)
-        '''idOfComment = NewComment.id
-        commentsObj = get_object_or_404(Comment, id=idOfComment)
-        context = dict()
-        print ("object primary key is ")
-        print ("object primary key is "+ NewComment.text)
-        data = {
-            "pk": NewComment.pk,
-            "text": NewComment.text,
-            "pub_date": NewComment.pub_date,
-            "author": findUser(NewComment.author_id)["First_name"],
-            "email":findUser(NewComment.author_id)["email"]
-        }
 
-        #data={
-        #    'text':text,
-        #    'id':idOfComment
-        #}
-        return JsonResponse(data)'''
-
+"""
+This function will retrive a 'Delete' request and delete the comment on the database.
+"""
 @csrf_exempt
 def del_comment(request, article_id,comment_id):
         if request.method=='DELETE':
@@ -335,38 +328,50 @@ def del_comment(request, article_id,comment_id):
                 'id':comment_id
             }
             return JsonResponse(data)
-
+"""
+This function will retrive a get request and pass the all the likes and dislikes for a specific article
+"""
 def AllLikes(request, article_id):
     if request.method == 'GET':
-        likes = Like.objects.filter(article_id=article_id, isLike=1)
-        Likescount = likes.count()
-        dislikes = Like.objects.filter(article_id=article_id, isLike=0)
-        dislikescount = dislikes.count()
-        print()
+
         data={
-            'totalLikes':Likescount,
-            'totalDisLikes':dislikescount
+            'totalLikes':getCountForLikes(article_id,1),
+            'totalDisLikes':getCountForLikes(article_id,0)
         }
         return JsonResponse(data)
+
+"""
+addorDislike: This function will check if the user is logged in, if the user is logged in then the function will update the the 'likes' table for that user.
+The http response will provide if the table has been updated and the total number of likes and dislikes
+"""
+
 @csrf_exempt
 def addorDislike(request, article_id, isLike):
-    current_user= request.user
-    if request.method == 'POST':
-        try:
-            print ("user id is "+str(current_user.id))
-            check =Like.objects.get(article_id=article_id, author_id=current_user.id)
-            updateLike = Like.objects.filter(article_id=article_id,author_id=current_user.id).update(isLike=isLike)
-        except Like.DoesNotExist:
-            NewLike = Like(isLike= isLike, pub_date='2017-1-23',article_id=article_id,author_id=current_user.id)
-            NewLike.save()
+    if request.user.is_authenticated():#Checking if the user is authenticated
+        current_user= request.user#current user that is logged in
+        if request.method == 'POST':
+            try:#If the like object exist then update the boolean field on the database 'isLike' to the value isLike
+                check =Like.objects.get(article_id=article_id, author_id=current_user.id)
+                updateLike = Like.objects.filter(article_id=article_id,author_id=current_user.id).update(isLike=isLike)
+            except Like.DoesNotExist:#If the like object does not exist at all, then create a new Like object with the boolean isLike
+                NewLike = Like(isLike= isLike,article_id=article_id,author_id=current_user.id)
+                NewLike.save()
+            data={
+                'totalLikes':getCountForLikes(article_id,1),#Call the fucntion getCountForLikes to retrive the likes from the 'Like' table
+                 'totalDisLikes':getCountForLikes(article_id,0),#Call the fucntion getCountForLikes to retrive the dislikes from the 'Like' table
+                'updated': True
+            }
 
-    likes = Like.objects.filter(article_id=article_id, isLike=1)
-    Likescount = likes.count()
-    dislikes = Like.objects.filter(article_id=article_id, isLike=0)
-    dislikescount = dislikes.count()
-    print()
-    data={
-        'totalLikes':Likescount,
-        'totalDisLikes':dislikescount
-    }
-    return JsonResponse(data)
+            return JsonResponse(data)
+    else:#if the user has not logged in then this function will return just the updated count
+        context ={
+            'totalLikes':getCountForLikes(article_id,1),
+            'totalDisLikes':getCountForLikes(article_id,0),
+            'updated': False
+        }
+        return JsonResponse(context)
+
+def getCountForLikes(article_id, isLike):
+    LikeObj = Like.objects.filter(article_id=article_id, isLike=isLike)
+    Likescount = LikeObj.count()
+    return Likescount
