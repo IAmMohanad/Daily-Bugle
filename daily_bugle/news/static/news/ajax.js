@@ -76,7 +76,6 @@ $('#bad').click(function(){
 			error:  printError
 		});
 	});
-
 });
 
 function loadAllComments(data, textStatus, jqHXR){

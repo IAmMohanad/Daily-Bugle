@@ -10,15 +10,13 @@
         <h3>By: {{ article.author_name }}</h3>
 
         <p>{{ article.text }}</p>
-        <p>
-            {{ article.pk }}
-        </p>
     </div>
   </div>
 </div>
 <div class="row">
   <div class="col-md-10 col-md-offset-1">
     <div class='comment'>
+      <!--{% if user.is_authenticated %}-->
         <div class='second'>
             <h3>Comments:</h3>
             <form id=send method='POST' action="/article/{{ article.pk }}/comments">
@@ -28,6 +26,7 @@
                 <input type='submit' class="btn btn-default" value='Add Comment'>
             </form>
         </div>
+      <!--{% endif %}-->
 
         <div style="margin-top:15px;" class='Like'>
             <!--<h3>Buff Likes:</h3>-->

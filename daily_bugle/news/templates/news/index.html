@@ -32,7 +32,6 @@
 <script>
 
 $( document ).ready(function() {
-
   function addArticlesToPage(data, textStatus, jqHXR){
   	//$("#articles").empty();
     console.log(data);
@@ -50,10 +49,12 @@ $( document ).ready(function() {
   }
 
 $(document).on("click","#loadMore", function (){
+    var urlParams = new URLSearchParams(window.location.search);
+    var category = urlParams.get('category')
     var currentArticleAmount = $('.article').length
     console.log(currentArticleAmount)
     $.ajax({
-        url : "loadMore/"+currentArticleAmount,
+        url : "loadMore/"+currentArticleAmount+"?category="+category,
         type : "GET",
         data : {
           'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()

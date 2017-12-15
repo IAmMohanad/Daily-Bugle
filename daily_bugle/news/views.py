@@ -43,7 +43,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
 def index(request):
     #articlesList = getArticles()
     context = {}
-    context["articlesList"] = getArticles()
+    category = request.GET.get('category')#print(str(request.GET.get('category')+"........"))
+    context["articlesList"] = getArticles(category)
+    #print(str(category))
     context["currentPage"] = "index"
 
     #if request.user.is_authenticated():
@@ -85,7 +87,7 @@ def login(request):
         user = authenticate(email = email, password = password)
 
         if(user is None):
-            return render(request, 'news/registration/login.html', {'no_user':"Email does not exist"})
+            return render(request, 'news/registration/login.html', {'no_user':"Email or password are incorrect."})
         else:
             loginUser(request, user)
             current_user = user.id
@@ -120,7 +122,7 @@ def updateProfile(request):
         # save if valid
         if form.is_valid():
             form.save()
-            return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'success', 'user': request.user.id})
+            return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'success', 'user': request.user})
         else:
             # will go to the the ajax error: data.responseText
             return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'failed'})
@@ -130,10 +132,17 @@ def updateProfile(request):
 # Article Views
 #
 
-def getArticles():
+def getArticles(category):
+    #category_name_id = get_object_or_404(Category, name=category_name).pk
+    #articles = get_list_or_404(Article, category_id=category_name_id)
     total_articles = Article.objects.all().count()
-    articles = Article.objects.order_by("-pk")[:5] #.objects.all()
 
+    if category is not None:
+        print(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;"+str(category))
+        articles = Article.objects.filter(category_id=category).order_by("-pk")[:5] #.objects.all()
+    else:
+        print("SHOULD NOT BE EHRE MATEY")
+        articles = Article.objects.order_by("-pk")[:5]
     articlesList = []
 
     for article in articles:
@@ -149,11 +158,17 @@ def getArticles():
 
 def loadMoreArticles(request, articlesAmount):
     total_articles = Article.objects.all().count()
+    category = request.GET.get('category')
     if int(articlesAmount)  != 0 and articlesAmount is not None:
         if int(articlesAmount)  <= total_articles:
-            articles = Article.objects.order_by("-pk")[int(articlesAmount) : int(articlesAmount)  + 5]
+            if(category is not None):
+                articles = Article.objects.filter(category_id=category).order_by("-pk")[int(articlesAmount) : int(articlesAmount)  + 5]
+            else:
+                articles = Article.objects.order_by("-pk")[int(articlesAmount) : int(articlesAmount)  + 5]
 
     articlesList = []
+
+
 
     for article in articles:
         articlesList.append({
@@ -191,6 +206,7 @@ def article(request, article_id):
             "category_name": found_article.category.name,
             "user": request.user
         }
+        context["user"] = request.user
 
         return render(request, 'news/article.html', context)
     else:
@@ -235,7 +251,6 @@ def article_category(request, category_name):
     if request.method == 'GET': # Only accept GET request
         category_name_id = get_object_or_404(Category, name=category_name).pk
         articles = get_list_or_404(Article, category_id=category_name_id)
-
         # -- Article Model Format --
         # title = models.CharField(max_length=255)
         # text = models.TextField()
@@ -274,7 +289,7 @@ def findUser(author_id):
     }
     return userInfo
 
-@login_required
+
 @csrf_exempt
 def comment(request, article_id):
     if request.method == 'GET':
@@ -289,25 +304,25 @@ def comment(request, article_id):
                 "email":findUser(comment.author_id)["email"]
             }
         return JsonResponse(context)
-
-    if request.method=='POST':
-        current_user= request.user
-        RequestData = QueryDict(request.body)#Querydict is used to retrived the new price of the ITEM
-        text= RequestData.get('text')
-        #text = request.POST.get("name")
-        NewComment = Comment(text=text,article_id=article_id,author_id=current_user.id)
-        NewComment.save()
-        comments = get_list_or_404(Comment, article_id=article_id)
-        context = dict()
-        for comment in comments:
-            context[comment.pk] = {
-                "pk": comment.pk,
-                "text": comment.text,
-                "pub_date": comment.pub_date.strftime('%d, %b %Y'),
-                "author": findUser(comment.author_id)["First_name"],
-                "email":findUser(comment.author_id)["email"]
-            }
-        return JsonResponse(context)
+    if(request.user.is_authenticated()):
+        if request.method=='POST':
+            current_user= request.user
+            RequestData = QueryDict(request.body)#Querydict is used to retrived the new price of the ITEM
+            text= RequestData.get('text')
+            #text = request.POST.get("name")
+            NewComment = Comment(text=text,article_id=article_id,author_id=current_user.id)
+            NewComment.save()
+            comments = get_list_or_404(Comment, article_id=article_id)
+            context = dict()
+            for comment in comments:
+                context[comment.pk] = {
+                    "pk": comment.pk,
+                    "text": comment.text,
+                    "pub_date": comment.pub_date.strftime('%d, %b %Y'),
+                    "author": findUser(comment.author_id)["First_name"],
+                    "email":findUser(comment.author_id)["email"]
+                }
+            return JsonResponse(context)
         '''idOfComment = NewComment.id
         commentsObj = get_object_or_404(Comment, id=idOfComment)
         context = dict()
@@ -327,14 +342,17 @@ def comment(request, article_id):
         #}
         return JsonResponse(data)'''
 
+@login_required
 @csrf_exempt
 def del_comment(request, article_id,comment_id):
         if request.method=='DELETE':
-            Comment.objects.get(pk=comment_id).delete()
-            data={
-                'id':comment_id
-            }
-            return JsonResponse(data)
+            comment = Comment.objects.get(pk=comment_id)
+            if(request.user.id == comment.author_id):
+                Comment.objects.get(pk=comment_id).delete()
+                data={
+                    'id':comment_id
+                }
+                return JsonResponse(data)
 
 def AllLikes(request, article_id):
     if request.method == 'GET':
