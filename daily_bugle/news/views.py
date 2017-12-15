@@ -186,7 +186,8 @@ def loadMoreArticles(request, articlesAmount):
             if(category != "null"):
                 if(Category.objects.filter(category_id = int(category).count) == 0):
                     return HttpResponseForbidden()
-                articles = Article.objects.filter(category_id=int(category)).order_by("-pk")[int(articlesAmount) : int(articlesAmount)  + 5]
+                else:
+                    articles = Article.objects.filter(category_id=int(category)).order_by("-pk")[int(articlesAmount) : int(articlesAmount)  + 5]
             else:
                 articles = Article.objects.order_by("-pk")[int(articlesAmount) : int(articlesAmount)  + 5]
 
