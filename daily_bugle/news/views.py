@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, Http404, JsonResponse, QueryDict
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, Http404, JsonResponse, QueryDict, HttpResponseForbidden
 
 from django.template import loader
 
@@ -179,11 +179,11 @@ def loadMoreArticles(request, articlesAmount):
     if int(articlesAmount) != 0 and articlesAmount is not None:
         if int(articlesAmount)  <= total_articles:
             if(category != "null"):
+                if(Category.objects.filter(category_id = int(category).count) == 0):
+                    return HttpResponseForbidden()
                 articles = Article.objects.filter(category_id=int(category)).order_by("-pk")[int(articlesAmount) : int(articlesAmount)  + 5]
             else:
-                print("entered here")
                 articles = Article.objects.order_by("-pk")[int(articlesAmount) : int(articlesAmount)  + 5]
-                print("go to here")
 
             articlesList = []
 
