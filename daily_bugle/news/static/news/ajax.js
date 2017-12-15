@@ -77,7 +77,6 @@ $('#bad').click(function(){//When the dislike button is selected, and ajax call 
 			error:  printError
 		});
 	});
-
 });
 //Loading all the comments dynmaically on the article.html page.
 function loadAllComments(data, textStatus, jqHXR){
@@ -89,9 +88,9 @@ function loadAllComments(data, textStatus, jqHXR){
         $("#"+comment.pk).append(Comment);
 			var AuthorName = $("<li class='list-group-item' id= 'AuthorName' ></li>").text("Author: " + comment.author);
 				$("#"+comment.pk).append(AuthorName);
-			var AuthorEmail = $("<li class='list-group-item' id= 'AuthorEmail' ></li>").text("email : " + comment.email);
+			var AuthorEmail = $("<li class='list-group-item' id= 'AuthorEmail' ></li>").text("Email : " + comment.email);
 				$("#"+comment.pk).append(AuthorEmail);
-			var pub_date = $("<li class='list-group-item' id='pub_date' ></li>").text("Publication_date : " + comment.pub_date);
+			var pub_date = $("<li class='list-group-item' id='pub_date' ></li>").text("Publication date : " + comment.pub_date);
 				$("#"+comment.pk).append(pub_date);
 	    var DeleteButton= '<button type="submit" class="btn btn-warning deleteComment" name="DeleteButton">Delete</button>';
 	      $("#"+comment.pk).append(DeleteButton);

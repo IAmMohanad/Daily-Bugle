@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, Http404, JsonResponse, QueryDict
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, Http404, JsonResponse, QueryDict, HttpResponseForbidden
 
 from django.template import loader
 
@@ -27,7 +27,7 @@ from .serializers import ArticleSerializer,UserSerializer,CommentSerializer,Cate
 """
 The following four methods use django's ViewSet, this will allow for all the CRUD opertation on the API.
 The queryset is used to provid the records for each table in the database.
-The serializer_class is used to identify which serializers is being in the serializers.py classs 
+The serializer_class is used to identify which serializers is being in the serializers.py classs
 """
 class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all()
@@ -43,23 +43,28 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-@csrf_exempt
+"""
+Homepage. Loads the 5 latest articles, either from all categories if no category id is in get request or from the specific category is the id is present.
+"""
+#@csrf_exempt
 #@login_required
 def index(request):
-    #articlesList = getArticles()
     context = {}
-    context["articlesList"] = getArticles()
+    category = request.GET.get('category')#print(str(request.GET.get('category')+"........"))
+    context["articlesList"] = getArticles(category)
     context["currentPage"] = "index"
-
-    #if request.user.is_authenticated():
-        #context["user"] = request.user
 
     return render(request, 'news/index.html', context)
     """# redirect to the value of next if it is entered,
     otherwise to /accounts/profile/return
     redirect(request.POST.get('next','/accounts/profile/'))"""
 
-@csrf_exempt
+"""
+Allows the user to sign up. If GET request, return an empty SignUpForm.
+If POST request & form is valid create a new user object, login user then redirect them to index.
+If  POST request & form is NOT valid, return to the signup page with the form populated with the input data.
+"""
+#@csrf_exempt
 def signup(request):
     if(request.method == "POST"):
         #if form is valid, authenticate use and log them in.
@@ -80,7 +85,13 @@ def signup(request):
 
     return render(request, 'news/registration/signup.html', {'form':form})
 
-@csrf_exempt
+"""
+Log in the user.
+If GET request return the log in page.
+If POST request & user was succesfully authenticated log in user and redirect to homepage.
+If POST request & user was NOT succesfully authenticated, return to the log in page with error message.
+"""
+#@csrf_exempt
 def login(request):
     if(request.method == "GET"):
         return render(request, 'news/registration/login.html', {})
@@ -90,7 +101,7 @@ def login(request):
         user = authenticate(email = email, password = password)
 
         if(user is None):
-            return render(request, 'news/registration/login.html', {'no_user':"Email does not exist"})
+            return render(request, 'news/registration/login.html', {'no_user':"Email or password are incorrect."})
         else:
             loginUser(request, user)
             current_user = user.id
@@ -103,13 +114,17 @@ def login(request):
             #    return render(request, 'news/index.html', {'user':current_user})
 
 
-@csrf_exempt
+#@csrf_exempt
 def logout(request):
     logoutUser(request)
     return redirect('/')
 
-
-@csrf_exempt
+"""
+Allows the user to update their data. [name, email, phone]
+If GET returns the profile form with relevant data pre-populated.
+If POST retrieves the users data based on the users id and updates the relevant database entry.
+"""
+#@csrf_exempt
 @login_required
 def updateProfile(request):
     if(request.method == "GET"):
@@ -125,20 +140,23 @@ def updateProfile(request):
         # save if valid
         if form.is_valid():
             form.save()
-            return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'success', 'user': request.user.id})
+            return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'success', 'user': request.user})
         else:
-            # will go to the the ajax error: data.responseText
             return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'failed'})
 
-
-#
-# Article Views
-#
-
-def getArticles():
+"""
+Returns 5 articles.
+If category is NOT set returns the 5 most recent articles sorted in descending order based on their id.
+If category is set, returns 5 articles AND if their category_id matches the category in the request.
+"""
+#@csrf_exempt
+def getArticles(category):
     total_articles = Article.objects.all().count()
-    articles = Article.objects.order_by("-pk")[:5] #.objects.all()
 
+    if category is not None:
+        articles = Article.objects.filter(category_id=category).order_by("-pk")[:5]
+    else:
+        articles = Article.objects.order_by("-pk")[:5]
     articlesList = []
 
     for article in articles:
@@ -152,25 +170,42 @@ def getArticles():
         })
     return articlesList
 
+"""
+articlesAmount repersents the number of articles that are currently on the HTML page.
+Returns 5 articles based on the articlesAmount variable.
+For example, if articlesAmount is 5, returns articles 6-11.
+If category is NOT set returns most recent articles.
+If category is set, returns articles based on their category_id.
+"""
+#@csrf_exempt
 def loadMoreArticles(request, articlesAmount):
     total_articles = Article.objects.all().count()
-    if int(articlesAmount)  != 0 and articlesAmount is not None:
+    category = request.GET.get('category')
+    if int(articlesAmount) != 0 and articlesAmount is not None:
         if int(articlesAmount)  <= total_articles:
-            articles = Article.objects.order_by("-pk")[int(articlesAmount) : int(articlesAmount)  + 5]
+            if(category != "null"):
+                articles = Article.objects.filter(category_id=int(category)).order_by("-pk")[int(articlesAmount) : int(articlesAmount)  + 5]
+            else:
+                print("entered here")
+                articles = Article.objects.order_by("-pk")[int(articlesAmount) : int(articlesAmount)  + 5]
+                print("go to here")
 
-    articlesList = []
+            articlesList = []
 
-    for article in articles:
-        articlesList.append({
-            "id": article.pk,
-            "title": article.title,
-            "text": article.text,
-            "pub_date": article.pub_date,
-            "author_name": article.author.first_name,
-            "category_name": article.category.name
-        })
+            for article in articles:
+                articlesList.append({
+                    "id": article.pk,
+                    "title": article.title,
+                    "text": article.text,
+                    "pub_date": article.pub_date,
+                    "author_name": article.author.first_name,
+                    "category_name": article.category.name
+                })
+            return JsonResponse({"articlesList": articlesList})
 
-    return JsonResponse({"articlesList": articlesList})
+#
+# Article Views
+#
 
 # views.request
 # Returns back one article object
@@ -196,6 +231,7 @@ def article(request, article_id):
             "category_name": found_article.category.name,
             "user": request.user
         }
+        context["user"] = request.user
 
         return render(request, 'news/article.html', context)
     else:
@@ -240,7 +276,6 @@ def article_category(request, category_name):
     if request.method == 'GET': # Only accept GET request
         category_name_id = get_object_or_404(Category, name=category_name).pk
         articles = get_list_or_404(Article, category_id=category_name_id)
-
         # -- Article Model Format --
         # title = models.CharField(max_length=255)
         # text = models.TextField()
@@ -297,37 +332,44 @@ def comment(request, article_id):
                 "email":findUser(comment.author_id)["email"]
             }
         return JsonResponse(context)
-
-    if request.method=='POST':
-        current_user= request.user
-        RequestData = QueryDict(request.body)#Querydict is used to retrived the new price of the ITEM
-        text= RequestData.get('text')
-        #text = request.POST.get("name")
-        NewComment = Comment(text=text,article_id=article_id,author_id=current_user.id)
-        NewComment.save()
-        comments = get_list_or_404(Comment, article_id=article_id)
-        context = dict()
-        for comment in comments:
-            context[comment.pk] = {
+    if(request.user.is_authenticated()):
+        if request.method=='POST':
+            current_user= request.user
+            RequestData = QueryDict(request.body)#Querydict is used to retrived the new price of the ITEM
+            text= RequestData.get('text')
+            #text = request.POST.get("name")
+            NewComment = Comment(text=text,article_id=article_id,author_id=current_user.id)
+            NewComment.save()
+            comments = get_list_or_404(Comment, article_id=article_id)
+            context = dict()
+            for comment in comments:
+                context[comment.pk] = {
                 "pk": comment.pk,
                 "text": comment.text,
                 "pub_date": comment.pub_date.strftime('%d, %b %Y'),
                 "author": findUser(comment.author_id)["First_name"],
                 "email":findUser(comment.author_id)["email"]
-            }
-        return JsonResponse(context)
+                }
+                return JsonResponse(context)
+    else:
+        return HttpResponseForbidden()
+
 
 """
 This function will retrive a 'Delete' request and delete the comment on the database.
 """
+@login_required
 @csrf_exempt
 def del_comment(request, article_id,comment_id):
         if request.method=='DELETE':
-            Comment.objects.get(pk=comment_id).delete()
-            data={
-                'id':comment_id
-            }
-            return JsonResponse(data)
+            comment = Comment.objects.get(pk=comment_id)
+            if(request.user.id == comment.author_id):
+                Comment.objects.get(pk=comment_id).delete()
+                data={
+                    'id':comment_id
+                }
+                return JsonResponse(data)
+
 """
 This function will retrive a get request and pass the all the likes and dislikes for a specific article
 """

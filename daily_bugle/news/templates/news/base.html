@@ -3,22 +3,24 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>My Test</title>
+        <title>The Daily Bugle</title>
         <meta name="description" content="">
 
 
         <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="{% static 'news/main.css' %}">
+        <link rel="shortcut icon" href="{% static 'news/daily_bugle_icon.ico' %}">
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     </head>
     <body>
+      {% csrf_token %}
       <div id="main_container" class="container">
         <div class="row">
-          <div class="col-md-10 col-md-offset-1">
+          <div class="col-lg-10 col-lg-offset-1">
             <div id="main_logo">
-              <img <img src="{% static 'news/Daily_Bugle_Logo.jpg' %}" alt="logo">
+              <img class="img-responsive" src="{% static 'news/Daily_Bugle_Logo.jpg' %}" alt="logo">
             </div>
           </div>
       </div>
@@ -27,16 +29,16 @@
           <ul class="nav navbar-nav">
             <li class="active"><a href="/">Home</a></li>
             {% if currentPage == "index" %}
-              <li><a href="#">Business</a></li>
-              <li><a href="#">World</a></li>
-              <li><a href="#">Sport</a></li>
+              <li><a href="/?category=2">Business</a></li>
+              <li><a href="/?category=1">World</a></li>
+              <li><a href="/?category=3">Sport</a></li>
               <li class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">Categories
                 <span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                  <li><a href="#">Business</a></li>
-                  <li><a href="#">World</a></li>
-                  <li><a href="#">Sport</a></li>
+                  <li><a href="/?category=2">Business</a></li>
+                  <li><a href="/?category=1">World</a></li>
+                  <li><a href="/?category=3">Sport</a></li>
                 </ul>
               </li>
             {% endif %}

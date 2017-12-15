@@ -21,9 +21,10 @@ router.register(r'Category', views.CategoryViewSet)
 urlpatterns = [
     url(r'^api/', include(router.urls)),
     # Index Page
+    url(r'^/(?P<category>[0-9]+)$', views.index, name='indexWithCategory'),
     url(r'^$', views.index, name='index'),
 
-    url(r'^accounts/login/$', views.login, name='index'),
+    url(r'^accounts/login/$', views.login, name='loginRedirect'),
 
     # Sign Up Page
     url(r'^signup$', views.signup, name='signup'),
