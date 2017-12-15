@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '6w+5ovg(2#h050-$n+xydeh318%(e*zniq@asnbnj2dx#0gk=&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['dailybugle-nabil.apps.devcloud.eecs.qmul.ac.uk']
 
