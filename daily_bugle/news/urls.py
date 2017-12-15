@@ -8,7 +8,9 @@ from rest_framework import routers
 from . import views
 from django.conf.urls import include, url
 
-
+"""
+routers is used for the rest api framework, to route the to the respective view set for each model. 
+"""
 router = routers.DefaultRouter()
 router.register(r'Article', views.ArticleViewSet)
 router.register(r'User', views.UserViewSet)
