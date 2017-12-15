@@ -1,18 +1,73 @@
 <!doctype html>
+{% load staticfiles %}
 <html>
     <head>
         <meta charset="utf-8">
-        <title>My Test</title>
+        <title>The Daily Bugle</title>
         <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
 
         <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="{% static 'news/main.css' %}">
+        <link rel="shortcut icon" href="{% static 'news/daily_bugle_icon.ico' %}">
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     </head>
     <body>
+      {% csrf_token %}
+      <div id="main_container" class="container">
+        <div class="row">
+          <div class="col-lg-10 col-lg-offset-1">
+            <div id="main_logo">
+              <img class="img-responsive" src="{% static 'news/Daily_Bugle_Logo.jpg' %}" alt="logo">
+            </div>
+          </div>
+      </div>
+      <nav class="navbar navbar-default">
+        <div class="container">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="/">Home</a></li>
+            {% if currentPage == "index" %}
+              <li><a href="/?category=1">Business</a></li>
+              <li><a href="/?category=2">World</a></li>
+              <li><a href="/?category=3">Sport</a></li>
+              <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Categories
+                <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="/?category=1">Business</a></li>
+                  <li><a href="/?category=2">World</a></li>
+                  <li><a href="/?category=3">Sport</a></li>
+                </ul>
+              </li>
+            {% endif %}
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            {% if not user.is_authenticated %}
+              <li><a href="/signup"><span class="glyphicon glyphicon-user"></span>Sign Up</a></li>
+              <li style="margin-right:20px;"><a href="/login"><span class="glyphicon glyphicon-log-in"></span>Login</a></li>
+            {% else %}
+              <li class="dropdown">
+                <a style="margin-right:20px;" class="dropdown-toggle" data-toggle="dropdown" href="#">Settings
+                <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="/user/update">Profile</a></li>
+                  <li><a href="/logout">Log out</a></li>
+                </ul>
+              </li>
+            {% endif %}
+          </ul>
+        </div>
+      </nav>
       {% block content %}
+
       {% endblock %}
+      </div>
+      <!--<footer class="footer">
+        <div class="container">
+            <p class="text-muted text-center">Daily Bugle &copy; 2017</p>
+        </div>
+    </footer>-->
     </body>
 </html>

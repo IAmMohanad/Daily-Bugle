@@ -49,37 +49,36 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     def __str__(self):
-        return self.username
+        return self.email
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
-
     def __str__(self):
-        return str(self.pk)
+        return self.name
 
 class Article(models.Model):
     title = models.CharField(max_length=255)
     text = models.TextField()
-    pub_date = models.DateTimeField('date published')
-    author = models.ForeignKey(User, on_delete=models.CASCADE) # User ID - Many -> One / Many Articles -> One author
-    category = models.ForeignKey(Category, on_delete=models.CASCADE) # Category ID - One -> One / One Articles -> One Category
+    pub_date = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey(User, related_name='articles', on_delete=models.CASCADE) # User ID - Many -> One / Many Articles -> One author
+    category = models.ForeignKey(Category, related_name='articles', on_delete=models.CASCADE) # Category ID - One -> One / One Articles -> One Category
 
     def __str__(self):
-        return str(self.pk)
+        return self.title
 
 class Comment(models.Model):
     text = models.TextField()
-    author_id = models.ForeignKey(User) # User ID - Many -> One / Many Articles -> one author
+    author = models.ForeignKey(User) # User ID - Many -> One / Many Articles -> one author
     pub_date = models.DateTimeField(auto_now_add=True)
-    article_id = models.ForeignKey(Article, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article,related_name='comments',on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.pk)
+        return self.text
 
 class Like(models.Model):
     isLike = models.NullBooleanField()
     author = models.ForeignKey(User) # User ID - Many -> One / Many Articles -> one author
-    pub_date = models.DateTimeField('date published')
+    pub_date = models.DateTimeField(auto_now_add=True)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
 
     def __str__(self):

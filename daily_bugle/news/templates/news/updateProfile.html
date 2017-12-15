@@ -1,0 +1,34 @@
+{% extends 'news/base.html' %}
+
+{% block title %}profile{% endblock %}
+
+{% block content %}
+<div class="row">
+<h2>Update Profile</h2>
+
+<br>
+{%if saved%}
+<h4 class="alert alert-success">{{saved}}<h4>
+{%endif%}
+
+
+<form action="/user/update" method="post">
+{% csrf_token %}
+{%for field in form %}
+
+<div class="form-group">
+  <div class="form-text text-muted"> {{ field.errors }}</div>
+  <div class="col-form-label">{{ field.label_tag }}</div>{{ field }}
+  {% if field.help_text%}
+  <p class="form-text text-muted">{{ field.help_text|safe }}</p>
+  {% endif %}
+</div>
+
+{% endfor %}
+<button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+
+</div>
+
+{% endblock %}
