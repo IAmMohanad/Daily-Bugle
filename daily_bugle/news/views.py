@@ -154,7 +154,10 @@ def getArticles(category):
     total_articles = Article.objects.all().count()
 
     if category is not None:
-        articles = Article.objects.filter(category_id=category).order_by("-pk")[:5]
+        if(Category.objects.filter(id = int(category)).count == 0):
+            return redirect("/")
+        else:
+            articles = Article.objects.filter(category_id=category).order_by("-pk")[:5]
     else:
         articles = Article.objects.order_by("-pk")[:5]
     articlesList = []
@@ -184,8 +187,8 @@ def loadMoreArticles(request, articlesAmount):
     if int(articlesAmount) != 0 and articlesAmount is not None:
         if int(articlesAmount)  <= total_articles:
             if(category != "null"):
-                if(Category.objects.filter(category_id = int(category).count) == 0):
-                    return HttpResponseForbidden()
+                if(Category.objects.filter(id = int(category)).count == 0):
+                    return redirect("/")
                 else:
                     articles = Article.objects.filter(category_id=int(category)).order_by("-pk")[int(articlesAmount) : int(articlesAmount)  + 5]
             else:
@@ -319,7 +322,7 @@ def findUser(author_id):
 This function will check if the request is  GET method in which case it will provide all the comments for a specific article_id
 If the request method is post then it will post a new comment for the logged in user.
 """
-@csrf_exempt
+#@csrf_exempt
 def comment(request, article_id):
     if request.method == 'GET':
         comments = get_list_or_404(Comment, article_id=article_id)#Using get_list_or_404 becuase the the the commnent may not exist and it was throw a 404 error
@@ -339,11 +342,15 @@ def comment(request, article_id):
             RequestData = QueryDict(request.body)#Querydict is used to retrived the new price of the ITEM
             text= RequestData.get('text')
             #text = request.POST.get("name")
+            print("text"+text + " article_id" +str(article_id))
             NewComment = Comment(text=text,article_id=article_id,author_id=current_user.id)
             NewComment.save()
             comments = get_list_or_404(Comment, article_id=article_id)
+            #comments = Comment.objects.filter(article_id=article_id)
             context = dict()
+
             for comment in comments:
+                print("COMMENTS ARE::"+str(comment.pk))
                 context[comment.pk] = {
                 "pk": comment.pk,
                 "text": comment.text,
@@ -351,7 +358,7 @@ def comment(request, article_id):
                 "author": findUser(comment.author_id)["First_name"],
                 "email":findUser(comment.author_id)["email"]
                 }
-                return JsonResponse(context)
+            return JsonResponse(context)
     else:
         return HttpResponseForbidden()
 
@@ -360,7 +367,7 @@ def comment(request, article_id):
 This function will retrive a 'Delete' request and delete the comment on the database.
 """
 @login_required
-@csrf_exempt
+#@csrf_exempt
 def del_comment(request, article_id,comment_id):
         if request.method=='DELETE':
             comment = Comment.objects.get(pk=comment_id)
@@ -388,7 +395,7 @@ addorDislike: This function will check if the user is logged in, if the user is 
 The http response will provide if the table has been updated and the total number of likes and dislikes
 """
 
-@csrf_exempt
+#@csrf_exempt
 def addorDislike(request, article_id, isLike):
     if request.user.is_authenticated():#Checking if the user is authenticated
         current_user= request.user#current user that is logged in
