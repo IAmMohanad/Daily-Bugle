@@ -38,25 +38,28 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-@csrf_exempt
+"""
+Homepage. Loads the 5 latest articles, either from all categories if no category id is in get request or from the specific category is the id is present.
+"""
+#@csrf_exempt
 #@login_required
 def index(request):
-    #articlesList = getArticles()
     context = {}
     category = request.GET.get('category')#print(str(request.GET.get('category')+"........"))
     context["articlesList"] = getArticles(category)
-    #print(str(category))
     context["currentPage"] = "index"
-
-    #if request.user.is_authenticated():
-        #context["user"] = request.user
 
     return render(request, 'news/index.html', context)
     """# redirect to the value of next if it is entered,
     otherwise to /accounts/profile/return
     redirect(request.POST.get('next','/accounts/profile/'))"""
 
-@csrf_exempt
+"""
+Allows the user to sign up. If GET request, return an empty SignUpForm.
+If POST request & form is valid create a new user object, login user then redirect them to index.
+If  POST request & form is NOT valid, return to the signup page with the form populated with the input data.
+"""
+#@csrf_exempt
 def signup(request):
     if(request.method == "POST"):
         #if form is valid, authenticate use and log them in.
@@ -77,7 +80,13 @@ def signup(request):
 
     return render(request, 'news/registration/signup.html', {'form':form})
 
-@csrf_exempt
+"""
+Log in the user.
+If GET request return the log in page.
+If POST request & user was succesfully authenticated log in user and redirect to homepage.
+If POST request & user was NOT succesfully authenticated, return to the log in page with error message.
+"""
+#@csrf_exempt
 def login(request):
     if(request.method == "GET"):
         return render(request, 'news/registration/login.html', {})
@@ -100,13 +109,17 @@ def login(request):
             #    return render(request, 'news/index.html', {'user':current_user})
 
 
-@csrf_exempt
+#@csrf_exempt
 def logout(request):
     logoutUser(request)
     return redirect('/')
 
-
-@csrf_exempt
+"""
+Allows the user to update their data. [name, email, phone]
+If GET returns the profile form with relevant data pre-populated.
+If POST retrieves the users data based on the users id and updates the relevant database entry.
+"""
+#@csrf_exempt
 @login_required
 def updateProfile(request):
     if(request.method == "GET"):
@@ -124,24 +137,20 @@ def updateProfile(request):
             form.save()
             return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'success', 'user': request.user})
         else:
-            # will go to the the ajax error: data.responseText
             return render(request, 'news/updateProfile.html', {'form': form, 'saved': 'failed'})
 
-
-#
-# Article Views
-#
-
+"""
+Returns 5 articles.
+If category is NOT set returns the 5 most recent articles sorted in descending order based on their id.
+If category is set, returns 5 articles AND if their category_id matches the category in the request.
+"""
+#@csrf_exempt
 def getArticles(category):
-    #category_name_id = get_object_or_404(Category, name=category_name).pk
-    #articles = get_list_or_404(Article, category_id=category_name_id)
     total_articles = Article.objects.all().count()
 
     if category is not None:
-        print(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;"+str(category))
-        articles = Article.objects.filter(category_id=category).order_by("-pk")[:5] #.objects.all()
+        articles = Article.objects.filter(category_id=category).order_by("-pk")[:5]
     else:
-        print("SHOULD NOT BE EHRE MATEY")
         articles = Article.objects.order_by("-pk")[:5]
     articlesList = []
 
@@ -156,31 +165,42 @@ def getArticles(category):
         })
     return articlesList
 
+"""
+articlesAmount repersents the number of articles that are currently on the HTML page.
+Returns 5 articles based on the articlesAmount variable.
+For example, if articlesAmount is 5, returns articles 6-11.
+If category is NOT set returns most recent articles.
+If category is set, returns articles based on their category_id.
+"""
+#@csrf_exempt
 def loadMoreArticles(request, articlesAmount):
     total_articles = Article.objects.all().count()
     category = request.GET.get('category')
-    if int(articlesAmount)  != 0 and articlesAmount is not None:
+    if int(articlesAmount) != 0 and articlesAmount is not None:
         if int(articlesAmount)  <= total_articles:
-            if(category is not None):
-                articles = Article.objects.filter(category_id=category).order_by("-pk")[int(articlesAmount) : int(articlesAmount)  + 5]
+            if(category != "null"):
+                articles = Article.objects.filter(category_id=int(category)).order_by("-pk")[int(articlesAmount) : int(articlesAmount)  + 5]
             else:
+                print("entered here")
                 articles = Article.objects.order_by("-pk")[int(articlesAmount) : int(articlesAmount)  + 5]
+                print("go to here")
 
-    articlesList = []
+            articlesList = []
 
+            for article in articles:
+                articlesList.append({
+                    "id": article.pk,
+                    "title": article.title,
+                    "text": article.text,
+                    "pub_date": article.pub_date,
+                    "author_name": article.author.first_name,
+                    "category_name": article.category.name
+                })
+            return JsonResponse({"articlesList": articlesList})
 
-
-    for article in articles:
-        articlesList.append({
-            "id": article.pk,
-            "title": article.title,
-            "text": article.text,
-            "pub_date": article.pub_date,
-            "author_name": article.author.first_name,
-            "category_name": article.category.name
-        })
-
-    return JsonResponse({"articlesList": articlesList})
+#
+# Article Views
+#
 
 # views.request
 # Returns back one article object

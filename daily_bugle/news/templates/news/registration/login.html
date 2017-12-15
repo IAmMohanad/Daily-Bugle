@@ -8,6 +8,7 @@
 {% endif %}
 <h2>Login</h2>
 <form action="/login" method="post" id="login_form" style="border:0.5px solid #00BFFF;padding:10px;">
+  {% csrf_token %}
   <div class="form-group">
     <label for="email">Email</label>
     <input type="email" class="form-control" id="email" name="email" placeholder="Email">
